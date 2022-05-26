@@ -31,7 +31,16 @@ def exec_rmt_ssh_cmd ( ssh, ssh_cmd ):
     # ssh.connect( hostname=nmrObj.server_ip , username=nmrObj.ssh_usr, password=nmrObj.ssh_passwd, look_for_keys=False )
 
     stdin, stdout, stderr = ssh.exec_command( ssh_cmd )
+    
+    errmsg = stderr.read()
+    
+    if (errmsg):
+        print(errmsg)
+        
     stdout.channel.recv_exit_status()  # Blocking call
+    
+    
+  
 
     # ssh.close()
 
