@@ -25,7 +25,7 @@ class nmr_system_2022:
         self.pamp_gain_dB = 60  # preamp gain
         self.rx_gain_dB = 20  # rx amp gain
         self.totGain = 10 ** ( ( self.pamp_gain_dB + self.rx_gain_dB ) / 20 )
-        self.uvoltPerDigit = 3.2 * ( 10 ** 6 ) / 16384  # ADC conversion, in microvolt
+        self.uvoltPerDigit = 2.0 * ( 10 ** 6 ) / 4096  # ADC conversion, in microvolt
         self.fir_gain = 21513  # downconversion FIR filter gain (sum of all coefficients)
         self.dconv_gain = 0.707106781  # downconversion gain factor due to sine(45,135,225,315) multiplication
 
@@ -48,7 +48,7 @@ class nmr_system_2022:
     def exit( self ):
         exit_ntwrk ( self.ssh, self.scp )
 
-    def cpmg( self, cpmg_freq,
+    def cpmg_t2( self, cpmg_freq,
         bstrap_pchg_us,
         lcs_pchg_us,
         lcs_dump_us,
@@ -81,7 +81,79 @@ class nmr_system_2022:
         lcs_vpc_dchg_repeat    
     ):
         # execute cpmg sequence
-        exec_name = "cpmg"
+        exec_name = "cpmg_t2"
+
+        command = ( exec_name + " " +
+                   str( cpmg_freq ) + " " +
+                   str( bstrap_pchg_us ) + " " +
+                   str( lcs_pchg_us ) + " " +
+                   str( lcs_dump_us ) + " " +
+                   str( p90_pchg_us ) + " " +
+                   str( p90_pchg_refill_us ) + " " +
+                   str( p90_us ) + " " +
+                   str( p90_dchg_us ) + " " +
+                   str( p90_dtcl ) + " " +
+                   str( p180_pchg_us ) + " " +
+                   str( p180_pchg_refill_us ) + " " +
+                   str( p180_us ) + " " +
+                   str( p180_dchg_us ) + " " +
+                   str( p180_dtcl ) + " " +
+                   str( echoshift_us ) + " " +
+                   str( echotime_us ) + " " +
+                   str( scanspacing_us ) + " " +
+                   str( samples_per_echo ) + " " +
+                   str( echoes_per_scan ) + " " +
+                   str( n_iterate ) + " " +
+                   str( p180_ph_sel ) + " " +
+                   str( dconv_fact ) + " " +
+                   str( echoskip ) + " " +
+                   str( echodrop ) + " " +
+                   str( vvarac ) + " " +
+                   str( lcs_vpc_pchg_us ) + " " +
+                   str( lcs_recycledump_us ) + " " +
+                   str( lcs_vpc_pchg_repeat ) + " " +
+                   str( lcs_vpc_dchg_us ) + " " +
+                   str( lcs_wastedump_us ) + " " +
+                   str( lcs_vpc_dchg_repeat )
+                   )
+
+        ssh_cmd = self.server_path +'/'+ self.exec_folder +'/'+ command
+        exec_rmt_ssh_cmd_in_datadir( self.ssh, ssh_cmd, self.server_data_folder )
+
+    def cpmg_t2_iter( self, cpmg_freq,
+        bstrap_pchg_us,
+        lcs_pchg_us,
+        lcs_dump_us,
+        p90_pchg_us,
+        p90_pchg_refill_us,
+        p90_us,
+        p90_dchg_us,
+        p90_dtcl,
+        p180_pchg_us,
+        p180_pchg_refill_us,
+        p180_us,
+        p180_dchg_us,
+        p180_dtcl,
+        echoshift_us,
+        echotime_us,
+        scanspacing_us,
+        samples_per_echo,
+        echoes_per_scan,
+        n_iterate,
+        p180_ph_sel,
+        dconv_fact,
+        echoskip,
+        echodrop,
+        vvarac,
+        lcs_vpc_pchg_us,
+        lcs_recycledump_us,
+        lcs_vpc_pchg_repeat, 
+        lcs_vpc_dchg_us,
+        lcs_wastedump_us,
+        lcs_vpc_dchg_repeat    
+    ):
+        # execute cpmg sequence
+        exec_name = "cpmg_t2_iter"
 
         command = ( exec_name + " " +
                    str( cpmg_freq ) + " " +

@@ -32,8 +32,10 @@ def exec_rmt_ssh_cmd ( ssh, ssh_cmd ):
 
     stdin, stdout, stderr = ssh.exec_command( ssh_cmd )
     
-    errmsg = stderr.read()
+    msg = stdout.read()
+    print(msg)
     
+    errmsg = stderr.read()
     if (errmsg):
         print(errmsg)
         
