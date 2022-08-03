@@ -30,31 +30,30 @@ process_data = 1
 if ( meas_time ):
     start_time = time.time()
 
-plen_base = 5
-refill_mult = 5
+plen_base = 8
 
 # cpmg settings
-cpmg_freq = 3.97
+cpmg_freq = 3.98
 bstrap_pchg_us = 2000
 lcs_pchg_us = 50
 lcs_dump_us = 100
 p90_pchg_us = plen_base
-p90_pchg_refill_us = plen_base*refill_mult
+p90_pchg_refill_us = plen_base*5
 p90_us = 3
 p90_dchg_us = 100
 p90_dtcl = 0.5
-p180_pchg_us = plen_base *1.6
-p180_pchg_refill_us = plen_base*refill_mult*1.6
+p180_pchg_us = plen_base*1.6
+p180_pchg_refill_us = plen_base*1.6*5
 p180_us = p90_us
 p180_dchg_us = p90_dchg_us
 p180_dtcl = 0.5
-echoshift_us = 4
-echotime_us = 500
-scanspacing_us = 300000
+echoshift_us = 3
+echotime_us = 300
+scanspacing_us = 800000
 samples_per_echo = 512
 echoes_per_scan = 256
-n_iterate = 128 # unused for current cpmg code
-ph_cycl_en = 1 # phase cycle enable
+n_iterate = 8 # unused for current cpmg code
+ph_cycl_en = 0 # set this to 0 for phase 0, 1 for phase 90, 2 for phase 180, 3 for phase 270.
 dconv_fact = 1 # unused for current cpmg code
 echoskip = 1 # unused for current cpmg code
 echodrop = 0 # unused for current cpmg code
@@ -133,7 +132,7 @@ if ( process_data ):
     direct_read = 0
     datain = 0
     dconv_lpf_ord = 2  # downconversion order
-    dconv_lpf_cutoff_kHz = 500  # downconversion lpf cutoff
+    dconv_lpf_cutoff_kHz = 100  # downconversion lpf cutoff
     
     compute_multiple( nmrObj, data_parent_folder, meas_folder, file_name_prefix, en_fig, en_ext_param, thetaref, echoref_avg, direct_read, datain, dconv_lpf_ord, dconv_lpf_cutoff_kHz )
     

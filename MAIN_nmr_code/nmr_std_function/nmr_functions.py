@@ -440,6 +440,143 @@ def compute_multiple( nmrObj, data_parent_folder, meas_folder, file_name_prefix,
 
     return ( a, a_integ, a0, snr, T2, noise, res, theta, data_filt, echo_avg, t_echospace )
     
+def compute_in_bw_noise( en_filt, bw_kHz, Df_MHz, minfreq, maxfreq, data_parent_folder, plotname, en_fig ):
+
+    # variables to be input
+    # en_filt            : enable the software post-processing filter to limit the measurement bandwidth
+    # data_parent_folder : the folder for all datas
+    # en_fig            : enable figure
+
+    # compute settings
+
+    data_folder = ( data_parent_folder + '/' )
+    fig_num = 200
+
+    # variables from NMR settings
+    ( param_list, value_list ) = data_parser.parse_info( 
+        data_folder, 'acqu.par' )  # read file
+    adcFreq = data_parser.find_value( 
+        'adcFreq', param_list, value_list )
+    nrPnts = int( data_parser.find_value( 
+        'samples', param_list, value_list ) )
+
+    # parse file and remove DC component
+    nmean = 0
+    file_path = ( data_folder + 'noise.txt' )
+    one_scan_raw = np.array( data_parser.read_data( file_path ) )
+    nmean = np.mean( one_scan_raw )
+    one_scan = ( one_scan_raw - nmean )
+
+    # compute in-bandwidth noise
+    Sf = adcFreq * 1e6
+    # filter parameter
+    filt_ord = 2
+    filt_lpf_cutoff = bw_kHz * 1e3  # in Hz
+
+    T = 1 / Sf
+    t = np.linspace( 0, T * ( len( one_scan ) - 1 ), len( one_scan ) )
+
+    
+
+    # filter one_scan when filter is enabled. Otherwise, leave one_scan
+    if (en_filt):
+        # down-conversion
+        sReal = one_scan * np.cos( 2 * math.pi * Df_MHz * 1e6 * t )
+        sImag = one_scan * np.sin( 2 * math.pi * Df_MHz * 1e6 * t )
+        r = butter_lowpass_filter( sReal + 1j * sImag, filt_lpf_cutoff, Sf, filt_ord, False ) # filtered value
+        # upconversion
+        one_scan = np.real( r ) * np.cos( 2 * math.pi * Df_MHz * 1e6 * t ) + np.imag( r ) * np.sin( 2 * math.pi * Df_MHz * 1e6 * t )  # r * e^(j*w0*t)
+        # one_scan = np.real( one_scan ) # not needed, the result above contains only real values
+
+    # filter profile
+    filt_prfl = np.random.randn( len( one_scan ) )  # generate ones
+    filt_prfl_ori = filt_prfl  # noise data with no filter process
+    sfiltReal = filt_prfl * np.cos( 2 * math.pi * Df_MHz * 1e6 * t )  # real downconversion
+    sfiltImag = filt_prfl * np.sin( 2 * math.pi * Df_MHz * 1e6 * t )  # imag downconversion
+    filt_out = butter_lowpass_filter( sfiltReal + 1j * sfiltImag, filt_lpf_cutoff, Sf, filt_ord, False )  # filter
+    filt_prfl = np.real( filt_out ) * np.cos( 2 * math.pi * Df_MHz * 1e6 * t ) + np.imag( filt_out ) * np.sin( 2 * math.pi * Df_MHz * 1e6 * t )  # upconversion
+    # filt_prfl = np.real( filt_prfl ) # no need. the value is already real
+
+    # compute fft
+    spectx, specty = nmr_fft( one_scan, adcFreq, 0 )
+    specty = abs( specty )
+    fft_range = [i for i, value in enumerate( spectx ) if ( 
+        value >= minfreq and value <= maxfreq )]  # limit fft display
+
+    # compute fft for the filter profile
+    filtspectx, filtspecty = nmr_fft( filt_prfl, adcFreq, 0 )
+    filtspecty = abs( filtspecty )
+    filtorispecx, filtorispecty = nmr_fft( filt_prfl_ori, adcFreq, 0 )  # noise data with no filter process
+    filtorispecty = abs( filtorispecty )
+
+    # compute std
+    nstd = np.std( one_scan )
+
+    if en_fig:
+        plt.ion()
+        fig = plt.figure( fig_num )
+
+        # maximize window
+        plot_backend = matplotlib.get_backend()
+        mng = plt.get_current_fig_manager()
+        if plot_backend == 'TkAgg':
+            # mng.resize(*mng.window.maxsize())
+            mng.resize( 1400, 800 )
+        elif plot_backend == 'wxAgg':
+            mng.frame.Maximize( True )
+        elif plot_backend == 'Qt4Agg':
+            mng.window.showMaximized()
+
+        fig.clf()
+        ax = fig.add_subplot( 311 )
+
+        filtnorm = sum( specty[fft_range] ) / sum( filtspecty[fft_range] )
+
+        line1, = ax.plot( spectx[fft_range], specty[fft_range], 'b-', label = 'data', linewidth = 0.5 )
+        line2, = ax.plot( filtspectx[fft_range], filtspecty[fft_range] * filtnorm, 'r.', markersize = 0.8, label = 'synth. noise' )  # amplitude is normalized with the max value of specty
+        # line3, = ax.plot(filtorispecx[fft_range], filtorispecty[fft_range]*(filtnorm/2), 'y.', markersize=2.0, label='synth. noise unfiltered') # amplitude is normalized with the max value of specty
+
+        # ax.set_ylim(-50, 0)
+        ax.set_xlabel( 'Frequency (MHz)' )
+        ax.set_ylabel( 'Amplitude (a.u.)' )
+        ax.set_title( "Spectrum" )
+        ax.grid()
+        ax.legend()
+        plt.ylim( [-0.2, 5] )
+
+        # plot time domain data
+        ax = fig.add_subplot( 312 )
+        x_time = np.linspace( 1, len( one_scan_raw ), len( one_scan_raw ) )
+        x_time = np.multiply( x_time, ( 1 / adcFreq ) )  # in us
+        x_time = np.multiply( x_time, 1e-3 )  # in ms
+        line1, = ax.plot( x_time, one_scan, 'b-' , linewidth = 0.5 )
+        ax.set_xlabel( 'Time(ms)' )
+        ax.set_ylabel( 'Amplitude (a.u.)' )
+        ax.set_title( "Amplitude. std=%0.2f. mean=%0.2f." % ( nstd, nmean ) )
+        ax.grid()
+        if (en_filt):
+            plt.ylim( [-30, 30] )
+        else:
+            plt.ylim( [-800, 800] )
+
+        # plot histogram
+        n_bins = 200
+        ax = fig.add_subplot( 313 )
+        n, bins, patches = ax.hist( one_scan, bins = n_bins )
+        ax.set_title( "Histogram" )
+        # plt.ylim( [0, 2000] )
+
+        plt.tight_layout()
+        fig.canvas.draw()
+        fig.canvas.flush_events()
+
+        # fig = plt.gcf() # obtain handle
+        plt.savefig( data_folder + plotname )
+
+    # standard deviation of signal
+    print( '\t\t: rms= ' + '{0:.4f}'.format( nstd ) +
+          ' mean= {0:.4f}'.format( nmean ) )
+    return nstd, nmean
 
 def calcP90( Vpp, rs, L, f, numTurns, coilLength, coilFactor ):
 

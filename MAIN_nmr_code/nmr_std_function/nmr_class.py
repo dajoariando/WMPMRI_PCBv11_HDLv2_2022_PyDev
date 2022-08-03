@@ -188,6 +188,19 @@ class nmr_system_2022:
                    str( lcs_wastedump_us ) + " " +
                    str( lcs_vpc_dchg_repeat )
                    )
+    
+        ssh_cmd = self.server_path +'/'+ self.exec_folder +'/'+ command
+        exec_rmt_ssh_cmd_in_datadir( self.ssh, ssh_cmd, self.server_data_folder )
+        
+    def noise( self, f_adc, samples, vvarac ):
+        # execute cpmg sequence
+        exec_name = "noise"
 
+        command = ( exec_name + " " +
+                   str( f_adc ) + " " +
+                   str( samples ) + " " +
+                   str (vvarac)
+                   )
+    
         ssh_cmd = self.server_path +'/'+ self.exec_folder +'/'+ command
         exec_rmt_ssh_cmd_in_datadir( self.ssh, ssh_cmd, self.server_data_folder )
