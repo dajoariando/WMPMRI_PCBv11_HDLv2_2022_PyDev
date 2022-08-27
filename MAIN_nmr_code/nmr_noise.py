@@ -35,8 +35,18 @@ def analyze( nmrObj, samp_freq, samples, vvarac, en_filt, min_freq, max_freq, tu
 
         # compute_stats( min_freq, max_freq, data_folder, meas_folder[0], 'noise_plot.png', en_fig )
         compute_in_bw_noise( en_filt, meas_bw_kHz, tuning_freq, min_freq, max_freq, nmrObj.client_data_folder, 'noise_plot.png', en_fig )
-
+        
+        print("vvarac : ", vvarac, "\n")
+        
+        '''
+        if (vvarac < 4.7):
+                vvarac = vvarac + 0.1;
+        else:
+            vvarac = -4.9;
+        '''
+        
         if ( not continuous ):
+            
             break
 
 
@@ -45,14 +55,14 @@ def exit( nmrObj ):
 
 
 # uncomment this line to debug the nmr noise code locally here
-samp_freq = 30  # sampling frequency
-samples = 100000  # number of points
-vvarac = -2.6 # voltage for the preamp
-en_filt = True # enable post-processing filter to limit the measurement bandwidth
+samp_freq = 20  # sampling frequency
+samples = 10000  # number of points
+vvarac = -4.9 # voltage for the preamp
+en_filt = False # enable post-processing filter to limit the measurement bandwidth
 min_freq = 1.0  # in MHz
 max_freq = 10.0  # in MHz
 tuning_freq = 3.97 # hardware tuning frequency selector, using lookup table
-meas_bw_kHz = 100 # downconversion filter bw
+meas_bw_kHz = 200 # downconversion filter bw
 continuous = True  # continuous running at one frequency configuration
 client_data_folder = "D:\\NMR_DATA"
 en_fig = True

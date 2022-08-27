@@ -30,43 +30,44 @@ process_data = 1
 if ( meas_time ):
     start_time = time.time()
 
-plen_base = 5
-refill_mult = 5
+plen_base = 6 # the precharging length base
+refill_mult = 3.6 # the refill multiplication to compensate RF loss
+p180_p90_fact = 1.6 # multiplication factor between p90 to p180 length
 
 # cpmg settings
 cpmg_freq = 3.97
 bstrap_pchg_us = 2000
-lcs_pchg_us = 50
+lcs_pchg_us = 20
 lcs_dump_us = 100
 p90_pchg_us = plen_base
 p90_pchg_refill_us = plen_base*refill_mult
-p90_us = 3
+p90_us = 5
 p90_dchg_us = 100
 p90_dtcl = 0.5
-p180_pchg_us = plen_base *1.6
-p180_pchg_refill_us = plen_base*refill_mult*1.6
+p180_pchg_us = plen_base *p180_p90_fact
+p180_pchg_refill_us = plen_base*refill_mult*p180_p90_fact
 p180_us = p90_us
 p180_dchg_us = p90_dchg_us
 p180_dtcl = 0.5
-echoshift_us = 4
-echotime_us = 500
+echoshift_us = 5
+echotime_us = 300
 scanspacing_us = 300000
 samples_per_echo = 512
 echoes_per_scan = 256
-n_iterate = 128 # unused for current cpmg code
+n_iterate = 1 # unused for current cpmg code
 ph_cycl_en = 1 # phase cycle enable
 dconv_fact = 1 # unused for current cpmg code
 echoskip = 1 # unused for current cpmg code
 echodrop = 0 # unused for current cpmg code
-vvarac = -2.7
+vvarac = -3.2 # 
 # precharging the vpc
-lcs_vpc_pchg_us = 50
+lcs_vpc_pchg_us = 25
 lcs_recycledump_us = 1000
-lcs_vpc_pchg_repeat = 70
+lcs_vpc_pchg_repeat = 210
 # discharging the vpc
-lcs_vpc_dchg_us = 10
+lcs_vpc_dchg_us = 5
 lcs_wastedump_us = 200
-lcs_vpc_dchg_repeat = 250
+lcs_vpc_dchg_repeat = 2000
 
 # instantiate nmr object
 nmrObj = nmr_system_2022( client_data_folder )
