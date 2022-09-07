@@ -223,7 +223,7 @@ def compute_multiple( nmrObj, data_parent_folder, meas_folder, file_name_prefix,
             plt.title( "Averaged raw data" )
             plt.xlabel( 'time(ms)' )
             plt.ylabel( 'probe voltage (uV)' )
-            plt.savefig( data_folder + '.png' )
+            plt.savefig( data_folder + 'decay_raw.png' )
 
         # raw average data
         echo_rawavg = np.zeros( SpE, dtype = float )
@@ -239,7 +239,7 @@ def compute_multiple( nmrObj, data_parent_folder, meas_folder, file_name_prefix,
             plt.xlabel( 'time(uS)' )
             plt.ylabel( 'probe voltage (uV)' )
             plt.legend()
-            plt.savefig( data_folder + 'fig_echo_avg.png' )
+            plt.savefig( data_folder + 'echo_avg.png' )
 
         # filter the data
         data_filt = np.zeros( ( NoE, SpE ), dtype = complex )
@@ -276,7 +276,7 @@ def compute_multiple( nmrObj, data_parent_folder, meas_folder, file_name_prefix,
         plt.figure( 2 )
         plt.clf()
 
-        data_parser.write_text_overwrite( data_folder, "fig_filt_data.txt", "settings: NoE: %d, SpE: %d, tE: %0.2f, fs: %0.2f. Format: re(echo1), im(echo1), re(echo2), im(echo2), ... " % ( NoE, SpE, tE, Sf ) )
+        data_parser.write_text_overwrite( data_folder, "decay_filt.txt", "settings: NoE: %d, SpE: %d, tE: %0.2f, fs: %0.2f. Format: re(echo1), im(echo1), re(echo2), im(echo2), ... " % ( NoE, SpE, tE, Sf ) )
 
         for i in range( 0, NoE ):
             plt.plot( ( i * tE * 1e-6 + echo_space ) * 1e3,
@@ -285,14 +285,14 @@ def compute_multiple( nmrObj, data_parent_folder, meas_folder, file_name_prefix,
                      np.imag( data_filt[i, :] ), 'r', linewidth = 0.4 )
 
         for i in range ( 0, NoE ):
-            data_parser.write_text_append_row( data_folder, "fig_filt_data.txt", np.real( data_filt[i, :] ) )
-            data_parser.write_text_append_row( data_folder, "fig_filt_data.txt", np.imag( data_filt[i, :] ) )
+            data_parser.write_text_append_row( data_folder, "decay_filt.txt", np.real( data_filt[i, :] ) )
+            data_parser.write_text_append_row( data_folder, "decay_filt.txt", np.imag( data_filt[i, :] ) )
 
         plt.legend()
         plt.title( 'Filtered data' )
         plt.xlabel( 'Time (mS)' )
         plt.ylabel( 'probe voltage (uV)' )
-        plt.savefig( data_folder + 'fig_filt_data.png' )
+        plt.savefig( data_folder + 'decay_filt.png' )
 
     # find echo average, echo magnitude
     echo_avg = np.zeros( SpE, dtype = complex )
@@ -310,13 +310,13 @@ def compute_multiple( nmrObj, data_parent_folder, meas_folder, file_name_prefix,
         plt.xlabel( 'time(uS)' )
         plt.ylabel( 'probe voltage (uV)' )
         plt.legend()
-        plt.savefig( data_folder + 'fig_echo_shape.png' )
+        plt.savefig( data_folder + 'echo_shape.png' )
         
-        data_parser.write_text_overwrite( data_folder, "fig_echo_shape.txt", "format: abs, real, imag, time_us" )
-        data_parser.write_text_append_row( data_folder, "fig_echo_shape.txt", np.abs( echo_avg ) )
-        data_parser.write_text_append_row( data_folder, "fig_echo_shape.txt", np.real( echo_avg ) )
-        data_parser.write_text_append_row( data_folder, "fig_echo_shape.txt", np.imag( echo_avg ) )
-        data_parser.write_text_append_row( data_folder, "fig_echo_shape.txt", tacq )
+        data_parser.write_text_overwrite( data_folder, "echo_shape.txt", "format: abs, real, imag, time_us" )
+        data_parser.write_text_append_row( data_folder, "echo_shape.txt", np.abs( echo_avg ) )
+        data_parser.write_text_append_row( data_folder, "echo_shape.txt", np.real( echo_avg ) )
+        data_parser.write_text_append_row( data_folder, "echo_shape.txt", np.imag( echo_avg ) )
+        data_parser.write_text_append_row( data_folder, "echo_shape.txt", tacq )
 
         # plot fft of the echosum
         plt.figure( 4 )
@@ -338,12 +338,12 @@ def compute_multiple( nmrObj, data_parent_folder, meas_folder, file_name_prefix,
         plt.xlabel( 'offset frequency(MHz)' )
         plt.ylabel( 'Echo amplitude (a.u.)' )
         plt.legend()
-        plt.savefig( data_folder + 'fig_echo_A.png' )
+        plt.savefig( data_folder + 'echo_spect.png' )
         
-        data_parser.write_text_overwrite( data_folder, "fig_echo_A.txt", "format: real, imag, freq_MHz" )
-        data_parser.write_text_append_row( data_folder, "fig_echo_A.txt", np.real( spect ) )
-        data_parser.write_text_append_row( data_folder, "fig_echo_A.txt", np.imag( spect ) )
-        data_parser.write_text_append_row( data_folder, "fig_echo_A.txt", wvect / ( 2 * np.pi ) )
+        data_parser.write_text_overwrite( data_folder, "echo_spect.txt", "format: real, imag, freq_MHz" )
+        data_parser.write_text_append_row( data_folder, "echo_spect.txt", np.real( spect ) )
+        data_parser.write_text_append_row( data_folder, "echo_spect.txt", np.imag( spect ) )
+        data_parser.write_text_append_row( data_folder, "echo_spect.txt", wvect / ( 2 * np.pi ) )
 
     # matched filtering
     a = np.zeros( NoE, dtype = complex )
@@ -422,13 +422,13 @@ def compute_multiple( nmrObj, data_parent_folder, meas_folder, file_name_prefix,
             snr, snr_res, a0, ( noise * math.sqrt( total_scan ) ), ( res * math.sqrt( total_scan ) ), T2 * 1e3 ) )
         plt.xlabel( 'Time (mS)' )
         plt.ylabel( 'probe voltage (uV)' )
-        plt.savefig( data_folder + 'fig_matched_filt_data.png' )
+        plt.savefig( data_folder + 'decay_sum.png' )
 
-        data_parser.write_text_overwrite( data_folder, "fig_matched_filt_data.txt", "output params: noise std: %0.5f, res std: %0.5f, snr_imag: %0.3f, snr_res: %0.3f, a0: %0.3f, T2: %0.3f ms. Format: a_real, a_imag, fit, time(s) " % ( noise, res, snr_imag, snr_res, a0, T2 * 1e3 ) )
-        data_parser.write_text_append_row( data_folder, "fig_matched_filt_data.txt", np.real( a ) )
-        data_parser.write_text_append_row( data_folder, "fig_matched_filt_data.txt", np.imag( a ) )
-        data_parser.write_text_append_row( data_folder, "fig_matched_filt_data.txt", f )
-        data_parser.write_text_append_row( data_folder, "fig_matched_filt_data.txt", t_echospace )
+        data_parser.write_text_overwrite( data_folder, "decay_sum.txt", "output params: noise std: %0.5f, res std: %0.5f, snr_imag: %0.3f, snr_res: %0.3f, a0: %0.3f, T2: %0.3f ms. Format: a_real, a_imag, fit, time(s) " % ( noise, res, snr_imag, snr_res, a0, T2 * 1e3 ) )
+        data_parser.write_text_append_row( data_folder, "decay_sum.txt", np.real( a ) )
+        data_parser.write_text_append_row( data_folder, "decay_sum.txt", np.imag( a ) )
+        data_parser.write_text_append_row( data_folder, "decay_sum.txt", f )
+        data_parser.write_text_append_row( data_folder, "decay_sum.txt", t_echospace )
 
     if en_fig and compute_figure:
         plt.show()
@@ -536,7 +536,7 @@ def compute_in_bw_noise( en_filt, bw_kHz, Df_MHz, minfreq, maxfreq, data_parent_
         # line2, = ax.plot( filtspectx[fft_range], filtspecty[fft_range] * filtnorm, 'r.', markersize = 0.8, label = 'synth. noise' )  # amplitude is normalized with the max value of specty
         # line3, = ax.plot(filtorispecx[fft_range], filtorispecty[fft_range]*(filtnorm/2), 'y.', markersize=2.0, label='synth. noise unfiltered') # amplitude is normalized with the max value of specty
 
-        # ax.set_ylim(-50, 0)
+        # ax.set_ylim(0, 60)
         ax.set_xlabel( 'Frequency (MHz)' )
         ax.set_ylabel( 'Amplitude (a.u.)' )
         ax.set_title( "Spectrum" )
@@ -554,10 +554,12 @@ def compute_in_bw_noise( en_filt, bw_kHz, Df_MHz, minfreq, maxfreq, data_parent_
         ax.set_ylabel( 'Amplitude (a.u.)' )
         ax.set_title( "Amplitude. std=%0.2f. mean=%0.2f." % ( nstd, nmean ) )
         ax.grid()
-        #if (en_filt):
-        #    plt.ylim( [-30, 30] )
-        #else:
-        #    plt.ylim( [-10, 10] )
+        '''
+        if (en_filt):
+            plt.ylim( [-2000, 2000] )
+        else:
+            plt.ylim( [-2000, 2000] )
+        '''
 
         # plot histogram
         n_bins = 200

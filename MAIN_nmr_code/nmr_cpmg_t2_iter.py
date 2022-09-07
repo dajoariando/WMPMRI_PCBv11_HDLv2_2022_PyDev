@@ -9,6 +9,7 @@ Created on May 24, 2022
 
 import os
 import time
+from datetime import datetime
 
 import pydevd
 from scipy import signal
@@ -21,8 +22,21 @@ from nmr_std_function.ntwrk_functions import cp_rmt_file, cp_rmt_folder, exec_rm
 from nmr_std_function.nmr_functions import plot_echosum
 from nmr_std_function.nmr_functions import compute_multiple
 
+
+# get the current time
+now = datetime.now()
+datatime = now.strftime("%y%m%d_%H%M%S")
+
+# create folder for measurements
+data_parent_folder = 'D:'
+meas_folder = 'NMR_DATA'+'\\T2_'+datatime
+file_name_prefix = 'data_'
+absdatapath = data_parent_folder+'\\'+meas_folder
+if not os.path.exists(absdatapath):
+    os.makedirs(absdatapath)
+
 # variables
-client_data_folder = "D:\\NMR_DATA"
+client_data_folder = absdatapath
 en_fig = 1  # enable figure
 meas_time = 0  # measure time
 process_data = 1
@@ -30,18 +44,18 @@ process_data = 1
 if ( meas_time ):
     start_time = time.time()
 
-plen_base = 6 # the precharging length base
-refill_mult = 3.6 # the refill multiplication to compensate RF loss
+plen_base = 5 # the precharging length base
+refill_mult = 2.4 # the refill multiplication to compensate RF loss
 p180_p90_fact = 1.6 # multiplication factor between p90 to p180 length
 
 # cpmg settings
-cpmg_freq = 3.97
+cpmg_freq = 4.08
 bstrap_pchg_us = 2000
 lcs_pchg_us = 20
 lcs_dump_us = 100
 p90_pchg_us = plen_base
 p90_pchg_refill_us = plen_base*refill_mult
-p90_us = 5
+p90_us = 6.0
 p90_dchg_us = 100
 p90_dtcl = 0.5
 p180_pchg_us = plen_base *p180_p90_fact
@@ -59,7 +73,7 @@ ph_cycl_en = 1 # phase cycle enable
 dconv_fact = 1 # unused for current cpmg code
 echoskip = 1 # unused for current cpmg code
 echodrop = 0 # unused for current cpmg code
-vvarac = -3.2 # 
+vvarac = -1.46 # more negative, more capacitance
 # precharging the vpc
 lcs_vpc_pchg_us = 25
 lcs_recycledump_us = 1000
@@ -118,15 +132,13 @@ if ( meas_time ):
     start_time = time.time()
 
 if ( process_data ):
+    
+    
     # compute the generated data
     cp_rmt_file( nmrObj.scp, nmrObj.server_data_folder, nmrObj.client_data_folder, "datasum.txt" )
     cp_rmt_file( nmrObj.scp, nmrObj.server_data_folder, nmrObj.client_data_folder, "acqu.par" )
     # plot_echosum( nmrObj, nmrObj.client_data_folder + "\\" + "datasum.txt", samples_per_echo, echoes_per_scan, en_fig )
     
-    
-    data_parent_folder = 'D:'
-    meas_folder = 'NMR_DATA'
-    file_name_prefix = 'data_'
     
     en_ext_param = 0
     thetaref = 0
@@ -134,7 +146,7 @@ if ( process_data ):
     direct_read = 0
     datain = 0
     dconv_lpf_ord = 2  # downconversion order
-    dconv_lpf_cutoff_kHz = 500  # downconversion lpf cutoff
+    dconv_lpf_cutoff_kHz = 100  # downconversion lpf cutoff
     
     compute_multiple( nmrObj, data_parent_folder, meas_folder, file_name_prefix, en_fig, en_ext_param, thetaref, echoref_avg, direct_read, datain, dconv_lpf_ord, dconv_lpf_cutoff_kHz )
     
