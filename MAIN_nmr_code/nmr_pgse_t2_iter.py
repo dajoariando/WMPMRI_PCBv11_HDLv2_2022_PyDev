@@ -64,8 +64,8 @@ p180_us = p90_us
 p180_dchg_us = p90_dchg_us
 p180_dtcl = 0.5
 echoshift_us = 5
-echotime_us = 300
-scanspacing_us = 300000
+echotime_us = 1000
+scanspacing_us = 2000000
 samples_per_echo = 512
 echoes_per_scan = 256
 n_iterate = 1 # unused for current cpmg code
@@ -73,7 +73,7 @@ ph_cycl_en = 1 # phase cycle enable
 dconv_fact = 1 # unused for current cpmg code
 echoskip = 1 # unused for current cpmg code
 echodrop = 0 # unused for current cpmg code
-vvarac = -1.54 # more negative, more capacitance
+vvarac = -1.55 # more negative, more capacitance
 # precharging the vpc
 lcs_vpc_pchg_us = 25
 lcs_recycledump_us = 1000
@@ -82,6 +82,14 @@ lcs_vpc_pchg_repeat = 210
 lcs_vpc_dchg_us = 5
 lcs_wastedump_us = 200
 lcs_vpc_dchg_repeat = 2000
+# gradient params
+gradlen_us = 300 # gradient pulse length
+gradspac_us = echotime_us/2-gradlen_us # gradient pulse spacing
+gradz_volt = 1.0 # the gradient can be positive or negative
+
+# post-processing parameter
+dconv_lpf_ord = 2  # downconversion order
+dconv_lpf_cutoff_kHz = 200  # downconversion lpf cutoff
 
 # instantiate nmr object
 nmrObj = nmr_system_2022( client_data_folder )
@@ -92,7 +100,7 @@ if ( meas_time ):
     start_time = time.time()
 
 # run cpmg sequence
-nmrObj.cpmg_t2_iter(
+nmrObj.pgse_t2_iter(
     cpmg_freq,
     bstrap_pchg_us,
     lcs_pchg_us,
@@ -123,7 +131,10 @@ nmrObj.cpmg_t2_iter(
     lcs_vpc_pchg_repeat, 
     lcs_vpc_dchg_us,
     lcs_wastedump_us,
-    lcs_vpc_dchg_repeat
+    lcs_vpc_dchg_repeat,
+    gradlen_us,
+    gradspac_us,
+    gradz_volt
 )
 
 if ( meas_time ):
@@ -133,20 +144,17 @@ if ( meas_time ):
 
 if ( process_data ):
     
-    
     # compute the generated data
     cp_rmt_file( nmrObj.scp, nmrObj.server_data_folder, nmrObj.client_data_folder, "datasum.txt" )
     cp_rmt_file( nmrObj.scp, nmrObj.server_data_folder, nmrObj.client_data_folder, "acqu.par" )
     # plot_echosum( nmrObj, nmrObj.client_data_folder + "\\" + "datasum.txt", samples_per_echo, echoes_per_scan, en_fig )
     
-    
+    # external rotation and matched filtering parameter
     en_ext_param = 0
     thetaref = 0
     echoref_avg = 0
     direct_read = 0
     datain = 0
-    dconv_lpf_ord = 2  # downconversion order
-    dconv_lpf_cutoff_kHz = 100  # downconversion lpf cutoff
     
     compute_multiple( nmrObj, data_parent_folder, meas_folder, file_name_prefix, en_fig, en_ext_param, thetaref, echoref_avg, direct_read, datain, dconv_lpf_ord, dconv_lpf_cutoff_kHz )
     

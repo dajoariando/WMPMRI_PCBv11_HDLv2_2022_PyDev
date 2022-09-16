@@ -55,12 +55,12 @@ def exit( nmrObj ):
 
 
 # uncomment this line to debug the nmr noise code locally here
-samp_freq = 20  # sampling frequency
+samp_freq = 4.08*4  # sampling frequency
 samples = 100000  # number of points
-vvarac = -3.00 # voltage for the preamp (more negative, more capacitance)
+vvarac = -1.55 # voltage for the preamp (more negative, more capacitance)
 en_filt = False # enable post-processing filter to limit the measurement bandwidth
-min_freq = 3.0  # in MHz
-max_freq = 5.0  # in MHz
+min_freq = 0.001  # in MHz
+max_freq = 8.0  # in MHz
 tuning_freq = 4.0 # hardware tuning frequency selector, using lookup table
 meas_bw_kHz = 100 # downconversion filter bw
 continuous = True  # continuous running at one frequency configuration

@@ -192,6 +192,84 @@ class nmr_system_2022:
         ssh_cmd = self.server_path +'/'+ self.exec_folder +'/'+ command
         exec_rmt_ssh_cmd_in_datadir( self.ssh, ssh_cmd, self.server_data_folder )
         
+    def pgse_t2_iter( self, cpmg_freq,
+        bstrap_pchg_us,
+        lcs_pchg_us,
+        lcs_dump_us,
+        p90_pchg_us,
+        p90_pchg_refill_us,
+        p90_us,
+        p90_dchg_us,
+        p90_dtcl,
+        p180_pchg_us,
+        p180_pchg_refill_us,
+        p180_us,
+        p180_dchg_us,
+        p180_dtcl,
+        echoshift_us,
+        echotime_us,
+        scanspacing_us,
+        samples_per_echo,
+        echoes_per_scan,
+        n_iterate,
+        p180_ph_sel,
+        dconv_fact,
+        echoskip,
+        echodrop,
+        vvarac,
+        lcs_vpc_pchg_us,
+        lcs_recycledump_us,
+        lcs_vpc_pchg_repeat, 
+        lcs_vpc_dchg_us,
+        lcs_wastedump_us,
+        lcs_vpc_dchg_repeat,
+        gradlen_us,
+        gradspac_us,
+        gradz_volt
+    ):
+        # execute cpmg sequence
+        exec_name = "pgse_t2_iter"
+
+        command = ( exec_name + " " +
+                   str( cpmg_freq ) + " " +
+                   str( bstrap_pchg_us ) + " " +
+                   str( lcs_pchg_us ) + " " +
+                   str( lcs_dump_us ) + " " +
+                   str( p90_pchg_us ) + " " +
+                   str( p90_pchg_refill_us ) + " " +
+                   str( p90_us ) + " " +
+                   str( p90_dchg_us ) + " " +
+                   str( p90_dtcl ) + " " +
+                   str( p180_pchg_us ) + " " +
+                   str( p180_pchg_refill_us ) + " " +
+                   str( p180_us ) + " " +
+                   str( p180_dchg_us ) + " " +
+                   str( p180_dtcl ) + " " +
+                   str( echoshift_us ) + " " +
+                   str( echotime_us ) + " " +
+                   str( scanspacing_us ) + " " +
+                   str( samples_per_echo ) + " " +
+                   str( echoes_per_scan ) + " " +
+                   str( n_iterate ) + " " +
+                   str( p180_ph_sel ) + " " +
+                   str( dconv_fact ) + " " +
+                   str( echoskip ) + " " +
+                   str( echodrop ) + " " +
+                   str( vvarac ) + " " +
+                   str( lcs_vpc_pchg_us ) + " " +
+                   str( lcs_recycledump_us ) + " " +
+                   str( lcs_vpc_pchg_repeat ) + " " +
+                   str( lcs_vpc_dchg_us ) + " " +
+                   str( lcs_wastedump_us ) + " " +
+                   str( lcs_vpc_dchg_repeat ) + " " +
+                   str( gradlen_us ) + " " +
+                   str( gradspac_us ) + " " +
+                   str( gradz_volt )
+                   )
+    
+        ssh_cmd = self.server_path +'/'+ self.exec_folder +'/'+ command
+        exec_rmt_ssh_cmd_in_datadir( self.ssh, ssh_cmd, self.server_data_folder )
+        
     def noise( self, f_adc, samples, vvarac ):
         # execute cpmg sequence
         exec_name = "noise"
