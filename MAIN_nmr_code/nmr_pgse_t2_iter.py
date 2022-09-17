@@ -64,11 +64,11 @@ p180_us = p90_us
 p180_dchg_us = p90_dchg_us
 p180_dtcl = 0.5
 echoshift_us = 5
-echotime_us = 1000
+echotime_us = 300
 scanspacing_us = 2000000
 samples_per_echo = 512
-echoes_per_scan = 256
-n_iterate = 1 # unused for current cpmg code
+echoes_per_scan = 20
+n_iterate = 2 # unused for current cpmg code
 ph_cycl_en = 1 # phase cycle enable
 dconv_fact = 1 # unused for current cpmg code
 echoskip = 1 # unused for current cpmg code
@@ -83,9 +83,9 @@ lcs_vpc_dchg_us = 5
 lcs_wastedump_us = 200
 lcs_vpc_dchg_repeat = 2000
 # gradient params
-gradlen_us = 300 # gradient pulse length
+gradlen_us = 100 # gradient pulse length
 gradspac_us = echotime_us/2-gradlen_us # gradient pulse spacing
-gradz_volt = 1.0 # the gradient can be positive or negative
+gradz_volt = 0.0 # the gradient can be positive or negative
 
 # post-processing parameter
 dconv_lpf_ord = 2  # downconversion order

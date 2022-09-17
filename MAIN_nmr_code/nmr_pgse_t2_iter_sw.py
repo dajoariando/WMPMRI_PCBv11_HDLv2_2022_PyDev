@@ -67,12 +67,12 @@ p180_us = p90_us
 p180_dchg_us = p90_dchg_us
 p180_dtcl = 0.5
 echoshift_us = 5
-echotime_us = 1000
+echotime_us = 400
 scanspacing_us = 2000000
-samples_per_echo = 512
-echoes_per_scan = 256
-n_iterate = 32 # measurement iteration
-ref_iterate = 32 # reference iteration
+samples_per_echo = 1024
+echoes_per_scan = 600
+n_iterate = 8 # measurement iteration
+ref_iterate = 8 # reference iteration
 ph_cycl_en = 1 # phase cycle enable
 dconv_fact = 1 # unused for current cpmg code
 echoskip = 1 # unused for current cpmg code
@@ -88,12 +88,12 @@ lcs_wastedump_us = 200
 lcs_vpc_dchg_repeat = 2000
 
 # gradient params sweep parameter
-gradlen_us = 400 # gradient pulse length
+gradlen_us = 100 # gradient pulse length
 gradspac_us = echotime_us/2-gradlen_us # gradient pulse spacing
 # gradient strength sweep
 gradz_volt_Sta = -2.5  # this value must be lower than gradz_volt_Sto
 gradz_volt_Sto = 2.5
-gradz_volt_Spa = 0.5
+gradz_volt_Spa = 0.1
 gradz_volt_Sw = np.arange( gradz_volt_Sta, gradz_volt_Sto+gradz_volt_Spa/2, gradz_volt_Spa )
 
 # write sweep parameters
@@ -249,7 +249,7 @@ for i in range( len( gradz_volt_Sw ) ):
         
         a, a_integ, a0, snr, T2, noise, res, theta, data_filt, echo_avg, t_echospace = compute_multiple( nmrObj, data_parent_folder, indv_measdir, file_name_prefix, en_fig, en_ext_param, thetaref, echoref_avg, direct_read, datain, dconv_lpf_ord, dconv_lpf_cutoff_kHz )
         
-        data_parser.write_text_append( nmrObj.client_data_folder, "pgse_info.txt", "%.5f %.5f %.3f %.3f %.3f %.3f %.3f" % (a_integ, a0, snr, T2, noise, res, theta))
+        data_parser.write_text_append( nmrObj.client_data_folder, "pgse_info.txt", "%.6f %.6f %.6f %.6f %.6f %.6f %.6f" % (a_integ, a0, snr, T2, noise, res, theta))
         
         shutil.copy(indv_datadir+"\\decay_sum.png", nmrObj.client_data_folder+"\\decay_sum_%03d__%02.3f.png" % (i, gradz_volt_Sw[i]))
         shutil.copy(indv_datadir+"\\echo_shape.png", nmrObj.client_data_folder+"\\echo_shape_%03d__%02.3f.png" % (i, gradz_volt_Sw[i]))
