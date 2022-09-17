@@ -67,12 +67,12 @@ p180_us = p90_us
 p180_dchg_us = p90_dchg_us
 p180_dtcl = 0.5
 echoshift_us = 5
-echotime_us = 400
+echotime_us = 1000
 scanspacing_us = 3000000
 samples_per_echo = 1024
-echoes_per_scan = 600
-n_iterate = 32 # measurement iteration
-ref_iterate = 32 # reference iteration
+echoes_per_scan = 256
+n_iterate = 2 # measurement iteration
+ref_iterate = 2 # reference iteration
 ph_cycl_en = 1 # phase cycle enable
 dconv_fact = 1 # unused for current cpmg code
 echoskip = 1 # unused for current cpmg code
@@ -88,7 +88,7 @@ lcs_wastedump_us = 200
 lcs_vpc_dchg_repeat = 2000
 
 # gradient params sweep parameter
-gradlen_us = 100 # gradient pulse length
+gradlen_us = 400 # gradient pulse length
 gradspac_us = echotime_us/2-gradlen_us # gradient pulse spacing
 # gradient strength sweep
 gradz_volt_Sta = -2.5  # this value must be lower than gradz_volt_Sto
@@ -101,7 +101,7 @@ swsettings  = open(  absdatapath+"\\sw_settings.txt", 'w' )
 swsettings.write ("folder,gradz_voltage\n" %())
 
 # processing parameters
-dconv_lpf_ord = 3  # downconversion order
+dconv_lpf_ord = 2  # downconversion order
 dconv_lpf_cutoff_kHz = 100  # downconversion lpf cutoff
 ignore_echoes = 16 # ignore initial echoes for data processing
 
@@ -175,7 +175,7 @@ data_parser.write_text_overwrite( nmrObj.client_data_folder, "pgse_info.txt", "a
 
 for i in range( len( gradz_volt_Sw ) ):
     # print sweep information
-    print("\n(%d/%d) : gradz = %.3f" %(i+1,len(gradz_volt_Sw),gradz_volt_Sw[i]))
+    print("\n(%d/%d) : gradz = %.3f V" %(i+1,len(gradz_volt_Sw),gradz_volt_Sw[i]))
     
     # write settings
     swsettings.write ("%03d,%02.3f\n" %(i, gradz_volt_Sw[i]))

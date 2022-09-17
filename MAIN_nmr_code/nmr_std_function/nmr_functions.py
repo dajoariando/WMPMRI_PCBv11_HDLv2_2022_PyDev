@@ -263,7 +263,7 @@ def compute_multiple( nmrObj, data_parent_folder, meas_folder, file_name_prefix,
             a[i] = np.mean( np.multiply( data_filt[i, mtch_fltr_sta_idx:SpE], np.conj( echo_avg[mtch_fltr_sta_idx:SpE] / np.max(np.abs(echo_avg[mtch_fltr_sta_idx:SpE])) ) ) )  # (echo*normalize(echo_conjugate))
             # a[i] = np.mean( data_filt[i, mtch_fltr_sta_idx:SpE] ) # echo
 
-    a_integ = np.sum( np.real( a ) )
+    a_integ = np.sum( np.real( a[ignore_echoes:] ) )
 
     # def exp_func(x, a, b, c, d): # dual exponential
     #    return a * np.exp(-b * x) + c * np.exp(-d * x)
