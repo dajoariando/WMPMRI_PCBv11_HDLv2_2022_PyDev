@@ -68,16 +68,16 @@ p180_dchg_us = p90_dchg_us
 p180_dtcl = 0.5
 echoshift_us = 5
 echotime_us = 400
-scanspacing_us = 2000000
+scanspacing_us = 3000000
 samples_per_echo = 1024
 echoes_per_scan = 600
-n_iterate = 8 # measurement iteration
-ref_iterate = 8 # reference iteration
+n_iterate = 32 # measurement iteration
+ref_iterate = 32 # reference iteration
 ph_cycl_en = 1 # phase cycle enable
 dconv_fact = 1 # unused for current cpmg code
 echoskip = 1 # unused for current cpmg code
 echodrop = 0 # unused for current cpmg code
-vvarac = -1.55 # more negative, more capacitance
+vvarac = -1.6 # more negative, more capacitance
 # precharging the vpc
 lcs_vpc_pchg_us = 25
 lcs_recycledump_us = 1000
@@ -103,12 +103,12 @@ swsettings.write ("folder,gradz_voltage\n" %())
 # processing parameters
 dconv_lpf_ord = 3  # downconversion order
 dconv_lpf_cutoff_kHz = 100  # downconversion lpf cutoff
-
+ignore_echoes = 16 # ignore initial echoes for data processing
 
 # instantiate nmr object
 nmrObj = nmr_system_2022( client_data_folder )
 
-
+print("\n(Reference scan)" )
 # generate reference (set gradient to 0.0)
 # set a higher number of iteration
 nmrObj.pgse_t2_iter(
@@ -159,13 +159,11 @@ if ( process_data ):
     cp_rmt_file( nmrObj.scp, nmrObj.server_data_folder, indv_datadir, "acqu.par" )
     # plot_echosum( nmrObj, nmrObj.client_data_folder + "\\" + "datasum.txt", samples_per_echo, echoes_per_scan, en_fig )
     # set compute parameters
-    en_ext_param = 0
-    thetaref = 0
-    echoref_avg = 0
-    direct_read = 0
-    datain = 0
+    en_ext_param = 0 # enable external parameter for echo rotation and matched filtering
+    thetaref = 0 # external parameter: echo rotation angle
+    echoref_avg = 0 # external parameter: matched filtering echo average    
     # compute data
-    a_ref, a_integ_ref, a0_ref, snr_ref, T2_ref, noise_ref, res_ref, theta_ref, data_filt_ref, echo_avg_ref, t_echospace_ref = compute_multiple( nmrObj, data_parent_folder, indv_measdir, file_name_prefix, en_fig, en_ext_param, thetaref, echoref_avg, direct_read, datain, dconv_lpf_ord, dconv_lpf_cutoff_kHz )
+    a_ref, a_integ_ref, a0_ref, snr_ref, T2_ref, noise_ref, res_ref, theta_ref, data_filt_ref, echo_avg_ref, t_echospace_ref = compute_multiple( nmrObj, data_parent_folder, indv_measdir, file_name_prefix, en_fig, en_ext_param, thetaref, echoref_avg, dconv_lpf_ord, dconv_lpf_cutoff_kHz, ignore_echoes )
     # transfer data
     shutil.copy(indv_datadir+"\\decay_sum.png", nmrObj.client_data_folder+"\\decay_sum_ref.png" )
     shutil.copy(indv_datadir+"\\echo_shape.png", nmrObj.client_data_folder+"\\echo_shape_ref.png" )
@@ -176,6 +174,9 @@ if ( process_data ):
 data_parser.write_text_overwrite( nmrObj.client_data_folder, "pgse_info.txt", "a_integ, a0, snr, T2, noise, res, theta" ) # write pgse data
 
 for i in range( len( gradz_volt_Sw ) ):
+    # print sweep information
+    print("\n(%d/%d) : gradz = %.3f" %(i+1,len(gradz_volt_Sw),gradz_volt_Sw[i]))
+    
     # write settings
     swsettings.write ("%03d,%02.3f\n" %(i, gradz_volt_Sw[i]))
     
@@ -241,13 +242,11 @@ for i in range( len( gradz_volt_Sw ) ):
         # plot_echosum( nmrObj, nmrObj.client_data_folder + "\\" + "datasum.txt", samples_per_echo, echoes_per_scan, en_fig )
         
         # processing parameters
-        en_ext_param = 0 # enable external parameter rotation and matched filtering
-        thetaref = theta_ref
-        echoref_avg = echo_avg_ref
-        direct_read = 0
-        datain = 0
+        en_ext_param = 0 # enable external parameter for echo rotation and matched filtering
+        thetaref = theta_ref # external parameter: echo rotation angle
+        echoref_avg = echo_avg_ref # external parameter: matched filtering echo average
         
-        a, a_integ, a0, snr, T2, noise, res, theta, data_filt, echo_avg, t_echospace = compute_multiple( nmrObj, data_parent_folder, indv_measdir, file_name_prefix, en_fig, en_ext_param, thetaref, echoref_avg, direct_read, datain, dconv_lpf_ord, dconv_lpf_cutoff_kHz )
+        a, a_integ, a0, snr, T2, noise, res, theta, data_filt, echo_avg, t_echospace = compute_multiple( nmrObj, data_parent_folder, indv_measdir, file_name_prefix, en_fig, en_ext_param, thetaref, echoref_avg, dconv_lpf_ord, dconv_lpf_cutoff_kHz, ignore_echoes )
         
         data_parser.write_text_append( nmrObj.client_data_folder, "pgse_info.txt", "%.6f %.6f %.6f %.6f %.6f %.6f %.6f" % (a_integ, a0, snr, T2, noise, res, theta))
         

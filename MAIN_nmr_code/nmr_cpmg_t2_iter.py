@@ -83,6 +83,14 @@ lcs_vpc_dchg_us = 5
 lcs_wastedump_us = 200
 lcs_vpc_dchg_repeat = 2000
 
+# post-processing parameter
+dconv_lpf_ord = 2  # downconversion order
+dconv_lpf_cutoff_kHz = 200  # downconversion lpf cutoff
+en_ext_param = 0 # enable external parameter for echo rotation and matched filtering
+thetaref = 0 # external parameter: echo rotation angle
+echoref_avg = 0 # external parameter: matched filtering echo average
+ignore_echoes = 16 # ignore initial echoes for data processing
+
 # instantiate nmr object
 nmrObj = nmr_system_2022( client_data_folder )
 
@@ -133,22 +141,12 @@ if ( meas_time ):
 
 if ( process_data ):
     
-    
     # compute the generated data
     cp_rmt_file( nmrObj.scp, nmrObj.server_data_folder, nmrObj.client_data_folder, "datasum.txt" )
     cp_rmt_file( nmrObj.scp, nmrObj.server_data_folder, nmrObj.client_data_folder, "acqu.par" )
     # plot_echosum( nmrObj, nmrObj.client_data_folder + "\\" + "datasum.txt", samples_per_echo, echoes_per_scan, en_fig )
     
-    
-    en_ext_param = 0
-    thetaref = 0
-    echoref_avg = 0
-    direct_read = 0
-    datain = 0
-    dconv_lpf_ord = 2  # downconversion order
-    dconv_lpf_cutoff_kHz = 100  # downconversion lpf cutoff
-    
-    compute_multiple( nmrObj, data_parent_folder, meas_folder, file_name_prefix, en_fig, en_ext_param, thetaref, echoref_avg, direct_read, datain, dconv_lpf_ord, dconv_lpf_cutoff_kHz )
+    compute_multiple( nmrObj, data_parent_folder, meas_folder, file_name_prefix, en_fig, en_ext_param, thetaref, echoref_avg, dconv_lpf_ord, dconv_lpf_cutoff_kHz, ignore_echoes )
     
 if ( meas_time ):
     elapsed_time = time.time() - start_time
