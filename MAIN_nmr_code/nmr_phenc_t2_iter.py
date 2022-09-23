@@ -39,7 +39,7 @@ if not os.path.exists(absdatapath):
 client_data_folder = absdatapath
 en_fig = 1  # enable figure
 meas_time = 0  # measure time
-process_data = 1 # process data and plot
+process_data = 1 # process the nmr data, otherwise it'll be skipped
 
 if ( meas_time ):
     start_time = time.time()
@@ -66,7 +66,7 @@ p180_dtcl = 0.5
 echoshift_us = 5
 echotime_us = 300
 scanspacing_us = 200000
-samples_per_echo = 512
+samples_per_echo = 1024
 echoes_per_scan = 256
 n_iterate = 8 # unused for current cpmg code
 ph_cycl_en = 1 # phase cycle enable
@@ -83,9 +83,10 @@ lcs_vpc_dchg_us = 5
 lcs_wastedump_us = 200
 lcs_vpc_dchg_repeat = 2000
 # gradient params
-gradlen_us = 100 # gradient pulse length
-gradspac_us = echotime_us/2-gradlen_us # gradient pulse spacing
-gradz_volt = 0.0 # the gradient can be positive or negative
+gradz_len_us = 100 # gradient pulse length
+gradz_volt = 0.7 # the gradient can be positive or negative
+enc_tao_us = 200 # the encoding time
+gradrefocus = 0 # put 1 for a regular PGSE sequence, but put 0 for phase encoding MRI imaging
 
 # post-processing parameter
 dconv_lpf_ord = 2  # downconversion order
@@ -104,7 +105,7 @@ if ( meas_time ):
     start_time = time.time()
 
 # run cpmg sequence
-nmrObj.pgse_t2_iter(
+nmrObj.phenc_t2_iter(
     cpmg_freq,
     bstrap_pchg_us,
     lcs_pchg_us,
@@ -136,9 +137,10 @@ nmrObj.pgse_t2_iter(
     lcs_vpc_dchg_us,
     lcs_wastedump_us,
     lcs_vpc_dchg_repeat,
-    gradlen_us,
-    gradspac_us,
-    gradz_volt
+    gradz_len_us,
+    gradz_volt,
+    enc_tao_us,
+    gradrefocus
 )
 
 if ( meas_time ):

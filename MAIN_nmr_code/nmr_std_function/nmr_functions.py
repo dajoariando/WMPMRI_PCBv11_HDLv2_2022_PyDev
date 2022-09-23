@@ -254,12 +254,12 @@ def compute_multiple( nmrObj, data_parent_folder, meas_folder, file_name_prefix,
     for i in range( 0, NoE ):
         if en_ext_param:
             # find amplitude with reference echo
-            # a[i] = np.mean( np.sqrt(np.multiply( data_filt[i, mtch_fltr_sta_idx:SpE], np.conj( echoref_avg[mtch_fltr_sta_idx:SpE] ) ) ) ) # sqrt(echo*echo_conjugate) --- wrong! because the echo average is a constant multiplier that does not change T2, but sqrt changes T2.
+            # a[i] = np.sqrt(np.mean( np.multiply( data_filt[i, mtch_fltr_sta_idx:SpE], np.conj( echoref_avg[mtch_fltr_sta_idx:SpE] ) ) ) ) # sqrt(echo*echo_conjugate) --- wrong! because the echo average is a constant multiplier that does not change T2, but sqrt changes T2.
             a[i] = np.mean( np.multiply( data_filt[i, mtch_fltr_sta_idx:SpE], np.conj( echoref_avg[mtch_fltr_sta_idx:SpE] ) ) ) # echo*echo_conjugate
             # a[i] = np.mean( data_filt[i, mtch_fltr_sta_idx:SpE] ) # echo
         else:
             # find amplitude with echo average
-            # a[i] = np.mean( np.sqrt(np.multiply( data_filt[i, mtch_fltr_sta_idx:SpE], np.conj( echo_avg[mtch_fltr_sta_idx:SpE] ) ) ) )  # sqrt(echo*echo_conjugate) --- wrong! because the echo average is a constant multiplier that does not change T2, but sqrt changes T2.
+            # a[i] = np.sqrt(np.mean(np.multiply( data_filt[i, mtch_fltr_sta_idx:SpE], np.conj( echo_avg[mtch_fltr_sta_idx:SpE] ) ) ) )  # sqrt(echo*echo_conjugate) --- wrong! because the echo average is a constant multiplier that does not change T2, but sqrt changes T2.
             a[i] = np.mean( np.multiply( data_filt[i, mtch_fltr_sta_idx:SpE], np.conj( echo_avg[mtch_fltr_sta_idx:SpE] / np.max(np.abs(echo_avg[mtch_fltr_sta_idx:SpE])) ) ) )  # (echo*normalize(echo_conjugate))
             # a[i] = np.mean( data_filt[i, mtch_fltr_sta_idx:SpE] ) # echo
 
@@ -271,7 +271,7 @@ def compute_multiple( nmrObj, data_parent_folder, meas_folder, file_name_prefix,
         return a * np.exp( -b * x )
 
     # average the first 5% of datas
-    a_guess = np.mean( np.real( a[0:int( np.round( SpE / 20 ) )] ) )
+    a_guess = np.mean( np.real( a[ignore_echoes:int( np.round( SpE / 20 ) )+ignore_echoes] ) )
     # c_guess = a_guess
     # find min idx value where the value of (a_guess/exp) is larger than
     # real(a)
@@ -279,7 +279,7 @@ def compute_multiple( nmrObj, data_parent_folder, meas_folder, file_name_prefix,
     #    np.real(a[np.real(a) > a_guess / np.exp(1)])))[0][0] * tE / 1e6
     # this is dummy b_guess, use the one I made above this for smarter one
     # (but sometimes it doesn't work)
-    b_guess = 0.01
+    b_guess = 0.01 # in second
     # d_guess = b_guess
     # guess = np.array([a_guess, b_guess, c_guess, d_guess])
     guess = np.array( [a_guess, b_guess] )
