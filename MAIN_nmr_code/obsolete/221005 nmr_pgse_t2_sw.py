@@ -159,11 +159,12 @@ if ( process_data ):
     cp_rmt_file( nmrObj.scp, nmrObj.server_data_folder, indv_datadir, "acqu.par" )
     # plot_echosum( nmrObj, nmrObj.client_data_folder + "\\" + "datasum.txt", samples_per_echo, echoes_per_scan, en_fig )
     # set compute parameters
-    en_ext_param = 0 # enable external parameter for echo rotation and matched filtering
+    en_ext_rotation = 0 # enable external reference for echo rotation
     thetaref = 0 # external parameter: echo rotation angle
-    echoref_avg = 0 # external parameter: matched filtering echo average    
+    en_ext_matchfilter = 0 # enable external reference for matched filtering
+    echoref_avg = 0 # echo_avg_ref # external parameter: matched filtering echo average 
     # compute data
-    a_ref, a_integ_ref, a0_ref, snr_ref, T2_ref, noise_ref, res_ref, theta_ref, data_filt_ref, echo_avg_ref, t_echospace_ref = compute_multiple( nmrObj, data_parent_folder, indv_measdir, file_name_prefix, en_fig, en_ext_param, thetaref, echoref_avg, dconv_lpf_ord, dconv_lpf_cutoff_kHz, ignore_echoes )
+    a_ref, a_integ_ref, a0_ref, snr_ref, T2_ref, noise_ref, res_ref, theta_ref, data_filt_ref, echo_avg_ref, t_echospace_ref = compute_multiple( nmrObj, data_parent_folder, indv_measdir, file_name_prefix, en_fig, en_ext_rotation, thetaref, en_ext_matchfilter, echoref_avg, dconv_lpf_ord, dconv_lpf_cutoff_kHz, ignore_echoes )
     # transfer data
     shutil.copy(indv_datadir+"\\decay_sum.png", nmrObj.client_data_folder+"\\decay_sum_ref.png" )
     shutil.copy(indv_datadir+"\\echo_shape.png", nmrObj.client_data_folder+"\\echo_shape_ref.png" )

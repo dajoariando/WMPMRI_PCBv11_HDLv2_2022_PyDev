@@ -304,8 +304,12 @@ class nmr_system_2022:
         lcs_vpc_dchg_repeat,
         gradz_len_us,
         gradz_volt,
+        gradz_refocus,
+        gradx_len_us,
+        gradx_volt,
+        gradx_refocus,
         enc_tao_us,
-        gradrefocus
+        p180_xy_angle
     ):
         # execute cpmg sequence
         exec_name = "phenc_t2_iter"
@@ -342,10 +346,18 @@ class nmr_system_2022:
                    str( lcs_vpc_dchg_us ) + " " +
                    str( lcs_wastedump_us ) + " " +
                    str( lcs_vpc_dchg_repeat ) + " " +
+                   
                    str( gradz_len_us ) + " " +
                    str( gradz_volt ) + " " +
+                   str( gradz_refocus ) + " " +
+                   
+                   str( gradx_len_us ) + " " +
+                   str( gradx_volt ) + " " +
+                   str( gradx_refocus ) + " " +
+                   
                    str( enc_tao_us ) + " " +
-                   str( gradrefocus )
+                   
+                   str(p180_xy_angle)
                    )
     
         ssh_cmd = self.server_path +'/'+ self.exec_folder +'/'+ command

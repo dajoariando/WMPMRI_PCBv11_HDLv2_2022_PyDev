@@ -65,10 +65,10 @@ p180_dchg_us = p90_dchg_us
 p180_dtcl = 0.5
 echoshift_us = 5
 echotime_us = 300
-scanspacing_us = 200000
+scanspacing_us = 400000
 samples_per_echo = 512
 echoes_per_scan = 256
-n_iterate = 8 # unused for current cpmg code
+n_iterate = 1 # unused for current cpmg code
 ph_cycl_en = 1 # phase cycle enable
 dconv_fact = 1 # unused for current cpmg code
 echoskip = 1 # unused for current cpmg code
@@ -90,10 +90,14 @@ gradz_volt = 0.0 # the gradient can be positive or negative
 # post-processing parameter
 dconv_lpf_ord = 2  # downconversion order
 dconv_lpf_cutoff_kHz = 200  # downconversion lpf cutoff
-en_ext_param = 0 # enable external parameter for echo rotation and matched filtering
+en_ext_rotation = 0 # enable external reference for echo rotation
 thetaref = 0 # external parameter: echo rotation angle
-echoref_avg = 0 # external parameter: matched filtering echo average
+en_ext_matchfilter = 0 # enable external reference for matched filtering
+echoref_avg = 0 # echo_avg_ref # external parameter: matched filtering echo average 
 ignore_echoes = 16 # ignore initial echoes for data processing
+
+
+
 
 # instantiate nmr object
 nmrObj = nmr_system_2022( client_data_folder )
@@ -153,7 +157,7 @@ if ( process_data ):
     cp_rmt_file( nmrObj.scp, nmrObj.server_data_folder, nmrObj.client_data_folder, "acqu.par" )
     # plot_echosum( nmrObj, nmrObj.client_data_folder + "\\" + "datasum.txt", samples_per_echo, echoes_per_scan, en_fig )
     
-    compute_multiple( nmrObj, data_parent_folder, meas_folder, file_name_prefix, en_fig, en_ext_param, thetaref, echoref_avg, dconv_lpf_ord, dconv_lpf_cutoff_kHz, ignore_echoes )
+    compute_multiple( nmrObj, data_parent_folder, meas_folder, file_name_prefix, en_fig, en_ext_rotation, thetaref, en_ext_matchfilter, echoref_avg, dconv_lpf_ord, dconv_lpf_cutoff_kHz, ignore_echoes )
     
 if ( meas_time ):
     elapsed_time = time.time() - start_time
