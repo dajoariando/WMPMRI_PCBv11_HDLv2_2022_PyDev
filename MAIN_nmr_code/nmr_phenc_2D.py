@@ -24,6 +24,7 @@ from nmr_std_function.ntwrk_functions import cp_rmt_file, cp_rmt_folder, exec_rm
 from nmr_std_function.nmr_functions import plot_echosum
 from nmr_std_function.nmr_functions import compute_multiple
 from nmr_std_function import data_parser
+from nmr_std_function.time_func import time_meas
 
 
 # get the current time
@@ -41,24 +42,24 @@ if not os.path.exists(absdatapath):
 # variables
 client_data_folder = absdatapath
 en_fig = 0  # enable figure
-meas_time = 0  # measure time
-process_data = 1
+report_time = True  # measure time
+process_data = 1 # process the NMR data
 
-if ( meas_time ):
-    start_time = time.time()
+tmeas = time_meas(report_time)
 
-plen_base = 5 # the precharging length base
-refill_mult = 2.2 # the refill multiplication to compensate RF loss
+# pulse parameters
+plen_base = 5.00 # the precharging length base
+refill_mult = 0.6 # the refill multiplication to compensate RF loss
 p180_p90_fact = 1.6 # multiplication factor between p90 to p180 length
 
 # cpmg settings
-cpmg_freq = 4.04
+cpmg_freq = 4.1
 bstrap_pchg_us = 2000
 lcs_pchg_us = 20
 lcs_dump_us = 100
 p90_pchg_us = plen_base
 p90_pchg_refill_us = plen_base*refill_mult
-p90_us = 5.6
+p90_us = 10
 p90_dchg_us = 100
 p90_dtcl = 0.5
 p180_pchg_us = plen_base *p180_p90_fact
@@ -66,17 +67,17 @@ p180_pchg_refill_us = plen_base*refill_mult*p180_p90_fact
 p180_us = p90_us
 p180_dchg_us = p90_dchg_us
 p180_dtcl = 0.5
-echoshift_us = 5
-echotime_us = 300
-scanspacing_us = 300000
-samples_per_echo = 512
-echoes_per_scan = 128
+echoshift_us = 10
+echotime_us = 500
+scanspacing_us = 100000
+samples_per_echo = 4096
+echoes_per_scan = 64
 n_iterate = 4 # unused for current cpmg code
 ph_cycl_en = 1 # phase cycle enable
 dconv_fact = 1 # unused for current cpmg code
 echoskip = 1 # unused for current cpmg code
 echodrop = 0 # unused for current cpmg code
-vvarac = -1.6 # set to -1.6 for Gy # more negative, more capacitance
+vvarac = -1.65 # set to -1.6 for Gy # more negative, more capacitance
 # precharging the vpc
 lcs_vpc_pchg_us = 25
 lcs_recycledump_us = 1000
@@ -86,15 +87,15 @@ lcs_vpc_dchg_us = 5
 lcs_wastedump_us = 200
 lcs_vpc_dchg_repeat = 2000
 # gradient params
-gradz_len_us = 375 # gradient pulse length
-gradz_refocus = 0 # put 1 for a regular PGSE sequence, but put 0 for phase encoding MRI imaging
-gradx_len_us = 375 # gradient pulse length
-gradx_refocus = 0 # put 1 for a regular PGSE sequence, but put 0 for phase encoding MRI imaging
-enc_tao_us = 400 # the encoding time
+gradz_len_us = 100 # gradient pulse length
+gradx_len_us = 100 # gradient pulse length
+grad_refocus = 1 # put 1 to enable refocusing of the gradient
+flip_grad_refocus_sign = 1 # put 1 to flip the gradient refocusing sign
+enc_tao_us = 200 # the encoding time
 # gradient strength sweep parameters
-grad_volt_Sta = -1.28
-grad_volt_Sto = 1.28
-grad_volt_Spa = 0.08
+grad_volt_Sta = -2.5
+grad_volt_Sto = 2.5
+grad_volt_Spa = 0.1
 grad_volt_Sw = np.arange( grad_volt_Sta, grad_volt_Sto+grad_volt_Spa/2, grad_volt_Spa )
 
 gradz_volt_Sw = grad_volt_Sw
@@ -145,12 +146,14 @@ nmrObj.phenc_t2_iter(
     lcs_vpc_dchg_repeat,
     gradz_len_us,
     0.0, # gradz strength set to 0 for reference
-    gradz_refocus,
     gradx_len_us,
     0.0, # gradz strength set to 0 for reference
-    gradx_refocus,
+    grad_refocus,
+    flip_grad_refocus_sign,
     enc_tao_us,
-    2 # 2 is for p180 y pulse
+    2, # 2 is for p180 y pulse
+    1, # enable lcs precharging
+    0, # disable lcs discharging
 )
 # process ref data
 if ( process_data ):
@@ -171,9 +174,9 @@ if ( process_data ):
     # compute data
     a_ref, a_integ_ref, a0_ref, snr_ref, T2_ref, noise_ref, res_ref, theta_ref, data_filt_ref, echo_avg_ref, t_echospace_ref = compute_multiple( nmrObj, data_parent_folder, indv_measdir, file_name_prefix, en_fig, en_ext_rotation, thetaref, en_ext_matchfilter, echoref_avg, dconv_lpf_ord, dconv_lpf_cutoff_kHz, ignore_echoes )
     # transfer data
-    shutil.copy(indv_datadir+"\\decay_sum.png", nmrObj.client_data_folder+"\\decay_sum_ref.png" )
-    shutil.copy(indv_datadir+"\\echo_shape.png", nmrObj.client_data_folder+"\\echo_shape_ref.png" )
-    shutil.copy(indv_datadir+"\\echo_spect.png", nmrObj.client_data_folder+"\\echo_spect_ref.png" )
+    # shutil.copy(indv_datadir+"\\decay_sum.png", nmrObj.client_data_folder+"\\decay_sum_ref.png" )
+    # shutil.copy(indv_datadir+"\\echo_shape.png", nmrObj.client_data_folder+"\\echo_shape_ref.png" )
+    # shutil.copy(indv_datadir+"\\echo_spect.png", nmrObj.client_data_folder+"\\echo_spect_ref.png" )
 
 
 # sweep measurements
@@ -189,21 +192,18 @@ swsettings.write ("folder,gradz_voltage\n" %())
 
 data_parser.write_text_overwrite( nmrObj.client_data_folder, phenc_sw_result, "a_integ, a0, snr, T2, noise, res, theta, asum_real, asum_imag" ) # write phenc output data
 
+tmeas.reportTimeSinceLast("############################################################################### load libraries and reference scan")
+
 for i in range( len( gradz_volt_Sw ) ):
     for j in range (len(gradx_volt_Sw)):
         
         ij = i*len(gradz_volt_Sw)+j # iteration number
         
         # print sweep information
-        print("\n(%d/%d) : gradz = %.3f V -- gradx = %.3f V" %(ij+1,len(gradz_volt_Sw)*len(gradx_volt_Sw),gradz_volt_Sw[i],gradx_volt_Sw[j]))
+        print("\n(%d/%d)(1/2) : gradz = %.3f V -- gradx = %.3f V" %(ij+1,len(gradz_volt_Sw)*len(gradx_volt_Sw),gradz_volt_Sw[i],gradx_volt_Sw[j]))
         
         # write settings
         swsettings.write ("%03d,%02.3f,%02.3f\n" %(ij, gradz_volt_Sw[i], gradx_volt_Sw[j]))
-        
-        if ( meas_time ):
-            elapsed_time = time.time() - start_time
-            print( "set parameter time: %.3f" % ( elapsed_time ) )
-            start_time = time.time()
         
         # run cpmg sequence
         nmrObj.phenc_t2_iter(
@@ -240,18 +240,17 @@ for i in range( len( gradz_volt_Sw ) ):
             lcs_vpc_dchg_repeat,
             gradz_len_us,
             gradz_volt_Sw[i],
-            gradz_refocus,
             gradx_len_us,
             gradx_volt_Sw[j],
-            gradx_refocus,
+            grad_refocus,
+            flip_grad_refocus_sign,
             enc_tao_us,
-            2 # 2 is for p180 y-pulse. 1 is for p180 x-pulse.
+            2, # 2 is for p180 y-pulse. 1 is for p180 x-pulse.
+            0, # disable lcs precharging
+            0 # disable lcs discharging
         )
         
-        if ( meas_time ):
-            elapsed_time = time.time() - start_time
-            print( "cpmgSequence acquisition time: %.3f" % ( elapsed_time ) )
-            start_time = time.time()
+        tmeas.reportTimeSinceLast("############################################################################## cpmg")
         
         if ( process_data ):
             
@@ -268,7 +267,7 @@ for i in range( len( gradz_volt_Sw ) ):
             
             # processing parameters
             en_ext_rotation = 1 # enable external reference for echo rotation
-            thetaref = 0 # external parameter: echo rotation angle
+            #thetaref =  # external parameter: echo rotation angle
             en_ext_matchfilter = 0 # enable external reference for matched filtering
             echoref_avg = 0 # echo_avg_ref # external parameter: matched filtering echo average
             
@@ -276,14 +275,11 @@ for i in range( len( gradz_volt_Sw ) ):
             
             data_parser.write_text_append( nmrObj.client_data_folder, phenc_sw_result, "%.6f %.6f %.6f %.6f %.6f %.6f %.6f %.6f %.6f" % (a_integ, a0, snr, T2, noise, res, theta, np.sum(np.real(echo_avg)), np.sum(np.imag(echo_avg)) ))
             
-            shutil.copy(indv_datadir+"\\decay_sum.png", nmrObj.client_data_folder+"\\decay_sum_%03d__%02.3f__%02.3f.png" % (ij, gradz_volt_Sw[i],gradx_volt_Sw[j]))
-            shutil.copy(indv_datadir+"\\echo_shape.png", nmrObj.client_data_folder+"\\echo_shape_%03d__%02.3f__%02.3f.png" % (ij, gradz_volt_Sw[i],gradx_volt_Sw[j]))
-            shutil.copy(indv_datadir+"\\echo_spect.png", nmrObj.client_data_folder+"\\echo_spect_%03d__%02.3f__%02.3f.png" % (ij, gradz_volt_Sw[i],gradx_volt_Sw[j]))
+            # shutil.copy(indv_datadir+"\\decay_sum.png", nmrObj.client_data_folder+"\\decay_sum_%03d__%02.3f__%02.3f.png" % (ij, gradz_volt_Sw[i],gradx_volt_Sw[j]))
+            # shutil.copy(indv_datadir+"\\echo_shape.png", nmrObj.client_data_folder+"\\echo_shape_%03d__%02.3f__%02.3f.png" % (ij, gradz_volt_Sw[i],gradx_volt_Sw[j]))
+            # shutil.copy(indv_datadir+"\\echo_spect.png", nmrObj.client_data_folder+"\\echo_spect_%03d__%02.3f__%02.3f.png" % (ij, gradz_volt_Sw[i],gradx_volt_Sw[j]))
             
-        if ( meas_time ):
-            elapsed_time = time.time() - start_time
-            print( "data processing time: %.3f" % ( elapsed_time ) )
-            start_time = time.time()
+        tmeas.reportTimeSinceLast("############################################################################## data processing")
 
 swsettings.close()
 
@@ -325,15 +321,10 @@ for i in range( len( gradz_volt_Sw ) ):
         ij = i*len(gradz_volt_Sw)+j # iteration number
         
         # print sweep information
-        print("\n(%d/%d) : gradz = %.3f V -- gradx = %.3f V" %(ij+1,len(gradz_volt_Sw)*len(gradx_volt_Sw),gradz_volt_Sw[i],gradx_volt_Sw[j]))
+        print("\n(%d/%d)(2/2) : gradz = %.3f V -- gradx = %.3f V" %(ij+1,len(gradz_volt_Sw)*len(gradx_volt_Sw),gradz_volt_Sw[i],gradx_volt_Sw[j]))
         
         # write settings
         swsettings.write ("%03d,%02.3f,%02.3f\n" %(ij, gradz_volt_Sw[i], gradx_volt_Sw[j]))
-        
-        if ( meas_time ):
-            elapsed_time = time.time() - start_time
-            print( "set parameter time: %.3f" % ( elapsed_time ) )
-            start_time = time.time()
         
         # run cpmg sequence
         nmrObj.phenc_t2_iter(
@@ -370,18 +361,17 @@ for i in range( len( gradz_volt_Sw ) ):
             lcs_vpc_dchg_repeat,
             gradz_len_us,
             gradz_volt_Sw[i],
-            gradz_refocus,
             gradx_len_us,
             gradx_volt_Sw[j],
-            gradx_refocus,
+            grad_refocus,
+            flip_grad_refocus_sign,
             enc_tao_us,
-            2 # 2 is for p180 y-pulse. 1 is for p180 x-pulse.
+            2, # 2 is for p180 y-pulse. 1 is for p180 x-pulse.
+            0, # disable lcs precharging
+            0 # disable lcs discharging
         )
         
-        if ( meas_time ):
-            elapsed_time = time.time() - start_time
-            print( "cpmgSequence acquisition time: %.3f" % ( elapsed_time ) )
-            start_time = time.time()
+        tmeas.reportTimeSinceLast("############################################################################## cpmg")
         
         if ( process_data ):
             
@@ -398,7 +388,7 @@ for i in range( len( gradz_volt_Sw ) ):
             
             # processing parameters
             en_ext_rotation = 1 # enable external reference for echo rotation
-            thetaref = 0 # external parameter: echo rotation angle
+            # thetaref = 0 # external parameter: echo rotation angle
             en_ext_matchfilter = 0 # enable external reference for matched filtering
             echoref_avg = 0 # echo_avg_ref # external parameter: matched filtering echo average
             
@@ -406,14 +396,55 @@ for i in range( len( gradz_volt_Sw ) ):
             
             data_parser.write_text_append( nmrObj.client_data_folder, phenc_sw_result, "%.6f %.6f %.6f %.6f %.6f %.6f %.6f %.6f %.6f" % (a_integ, a0, snr, T2, noise, res, theta, np.sum(np.real(echo_avg)), np.sum(np.imag(echo_avg)) ))
             
-            shutil.copy(indv_datadir+"\\decay_sum.png", nmrObj.client_data_folder+"\\decay_sum_%03d__%02.3f__%02.3f.png" % (ij, gradz_volt_Sw[i],gradx_volt_Sw[j]))
-            shutil.copy(indv_datadir+"\\echo_shape.png", nmrObj.client_data_folder+"\\echo_shape_%03d__%02.3f__%02.3f.png" % (ij, gradz_volt_Sw[i],gradx_volt_Sw[j]))
-            shutil.copy(indv_datadir+"\\echo_spect.png", nmrObj.client_data_folder+"\\echo_spect_%03d__%02.3f__%02.3f.png" % (ij, gradz_volt_Sw[i],gradx_volt_Sw[j]))
+            # shutil.copy(indv_datadir+"\\decay_sum.png", nmrObj.client_data_folder+"\\decay_sum_%03d__%02.3f__%02.3f.png" % (ij, gradz_volt_Sw[i],gradx_volt_Sw[j]))
+            # shutil.copy(indv_datadir+"\\echo_shape.png", nmrObj.client_data_folder+"\\echo_shape_%03d__%02.3f__%02.3f.png" % (ij, gradz_volt_Sw[i],gradx_volt_Sw[j]))
+            # shutil.copy(indv_datadir+"\\echo_spect.png", nmrObj.client_data_folder+"\\echo_spect_%03d__%02.3f__%02.3f.png" % (ij, gradz_volt_Sw[i],gradx_volt_Sw[j]))
             
-        if ( meas_time ):
-            elapsed_time = time.time() - start_time
-            print( "data processing time: %.3f" % ( elapsed_time ) )
-            start_time = time.time()
+        tmeas.reportTimeSinceLast("############################################################################## data processing")
 
 swsettings.close()
 
+# DUMMY SCAN: discharge power from the lcs
+nmrObj.phenc_t2_iter(
+        cpmg_freq,
+        bstrap_pchg_us,
+        lcs_pchg_us,
+        lcs_dump_us,
+        p90_pchg_us,
+        p90_pchg_refill_us,
+        p90_us,
+        p90_dchg_us,
+        p90_dtcl,
+        p180_pchg_us,
+        p180_pchg_refill_us,
+        p180_us,
+        p180_dchg_us,
+        p180_dtcl,
+        echoshift_us,
+        echotime_us,
+        scanspacing_us,
+        samples_per_echo,
+        echoes_per_scan,
+        1,
+        ph_cycl_en,
+        dconv_fact,
+        echoskip,
+        echodrop,
+        vvarac,
+        lcs_vpc_pchg_us,
+        lcs_recycledump_us,
+        lcs_vpc_pchg_repeat, 
+        lcs_vpc_dchg_us,
+        lcs_wastedump_us,
+        lcs_vpc_dchg_repeat,
+        gradz_len_us,
+        gradz_volt_Sw[i],
+        gradx_len_us,
+        gradx_volt_Sw[j],
+        grad_refocus,
+        flip_grad_refocus_sign,
+        enc_tao_us,
+        2, # 2 is for p180 y-pulse. 1 is for p180 x-pulse.
+        0, # disable lcs precharging
+        1 # enable lcs discharging
+    )

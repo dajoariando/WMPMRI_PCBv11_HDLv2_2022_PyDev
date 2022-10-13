@@ -87,7 +87,8 @@ lcs_wastedump_us = 200
 lcs_vpc_dchg_repeat = 2000
 # gradient params
 grad_len_us = 375 # gradient pulse length
-grad_refocus = 0 # put 1 for a regular PGSE sequence, but put 0 for phase encoding MRI imaging
+grad_refocus = 0 # put 1 to refocus gradient after pi-pulse
+flip_grad_refocus_sign = 1 # put 1 to flip the gradient pulse
 enc_tao_us = 400 # the encoding time
 # gradient strength sweep parameters
 grad_volt_Sta = -0.08 # this value must be lower than grad_volt_Sto
@@ -152,10 +153,10 @@ nmrObj.phenc_t2_iter(
     lcs_vpc_dchg_repeat,
     grad_len_us,
     0.0, # grad strength set to 0 for reference
-    grad_refocus,
     grad_len_us,
     0.0, # grad strength set to 0 for reference
     grad_refocus,
+    flip_grad_refocus_sign,
     enc_tao_us,
     2 # 2 is for p180 y pulse
 )
