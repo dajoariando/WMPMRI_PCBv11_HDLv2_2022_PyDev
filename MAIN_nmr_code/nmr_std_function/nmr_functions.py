@@ -329,16 +329,17 @@ def compute_multiple( nmrObj, phenc_conf, sav_fig, show_fig):
         snr_imag = a0 / ( noise * math.sqrt( total_scan ) )
         snr_res = a0 / ( res * math.sqrt( total_scan ) )
         snr = snr_imag
-
-        # plot fitted line
-        plt.figure( 5 )
-        plt.clf()
-        plt.cla()
-        plt.plot( t_echospace * 1e3, f, label = "fit" )  # plot in milisecond
-        plt.plot( t_echospace * 1e3, np.real( a ) - f, label = "residue" )
+        
+        if sav_fig:
+            # plot fitted line
+            plt.figure( 5 )
+            plt.clf()
+            plt.cla()
+            plt.plot( t_echospace * 1e3, f, label = "fit" )  # plot in milisecond
+            plt.plot( t_echospace * 1e3, np.real( a ) - f, label = "residue" )
 
     except:
-        print( 'Problem in fitting. Set a0 and T2 output to 0\n' )
+        print( '     Problem in fitting. Set a0 and T2 output to 0' )
         a0 = 0
         T2 = 0
         noise = 0
