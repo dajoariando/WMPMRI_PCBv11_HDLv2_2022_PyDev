@@ -79,7 +79,7 @@ def parse_csv_float4col( data_folder, file_name, skip_lines ):
 
 def parse_info( data_folder, file_name ):
     # filename = "CPMG_iterate_settings.txt"
-    file_path = data_folder + file_name
+    file_path = data_folder + '\\' + file_name
     f = open( file_path )
     csv_f = csv.reader( f, delimiter=' ' )
     param = []

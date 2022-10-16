@@ -40,6 +40,7 @@ class nmr_system_2022:
         # data folder
         self.server_data_folder = "/root/NMR_DATA"
         self.client_data_folder = client_data_folder
+        self.folder_extension = "" # folder extension for the measurement
         self.exec_folder = "c_exec"
 
         # configure the network
@@ -192,100 +193,58 @@ class nmr_system_2022:
         ssh_cmd = self.server_path +'/'+ self.exec_folder +'/'+ command
         exec_rmt_ssh_cmd_in_datadir( self.ssh, ssh_cmd, self.server_data_folder )
     
-    def phenc_t2_iter( self,
-        cpmg_freq,
-        bstrap_pchg_us,
-        lcs_pchg_us,
-        lcs_dump_us,
-        p90_pchg_us,
-        p90_pchg_refill_us,
-        p90_us,
-        p90_dchg_us,
-        p90_dtcl,
-        p180_pchg_us,
-        p180_pchg_refill_us,
-        p180_us,
-        p180_dchg_us,
-        p180_dtcl,
-        echoshift_us,
-        echotime_us,
-        scanspacing_us,
-        samples_per_echo,
-        echoes_per_scan,
-        n_iterate,
-        p180_ph_sel,
-        dconv_fact,
-        echoskip,
-        echodrop,
-        vvarac,
-        lcs_vpc_pchg_us,
-        lcs_recycledump_us,
-        lcs_vpc_pchg_repeat, 
-        lcs_vpc_dchg_us,
-        lcs_wastedump_us,
-        lcs_vpc_dchg_repeat,
-        gradz_len_us,
-        gradz_volt,
-        gradx_len_us,
-        gradx_volt,
-        grad_refocus,
-        flip_grad_refocus_sign,
-        enc_tao_us,
-        p180_xy_angle,
-        en_lcs_pchg,
-        en_lcs_dchg
-    ):
+    def phenc_t2_iter( self, phenc_conf ):
         # execute cpmg sequence
         exec_name = "phenc_t2_iter"
 
         command = ( exec_name + " " +
-                   str( cpmg_freq ) + " " +
-                   str( bstrap_pchg_us ) + " " +
-                   str( lcs_pchg_us ) + " " +
-                   str( lcs_dump_us ) + " " +
-                   str( p90_pchg_us ) + " " +
-                   str( p90_pchg_refill_us ) + " " +
-                   str( p90_us ) + " " +
-                   str( p90_dchg_us ) + " " +
-                   str( p90_dtcl ) + " " +
-                   str( p180_pchg_us ) + " " +
-                   str( p180_pchg_refill_us ) + " " +
-                   str( p180_us ) + " " +
-                   str( p180_dchg_us ) + " " +
-                   str( p180_dtcl ) + " " +
-                   str( echoshift_us ) + " " +
-                   str( echotime_us ) + " " +
-                   str( scanspacing_us ) + " " +
-                   str( samples_per_echo ) + " " +
-                   str( echoes_per_scan ) + " " +
-                   str( n_iterate ) + " " +
-                   str( p180_ph_sel ) + " " +
-                   str( dconv_fact ) + " " +
-                   str( echoskip ) + " " +
-                   str( echodrop ) + " " +
-                   str( vvarac ) + " " +
-                   str( lcs_vpc_pchg_us ) + " " +
-                   str( lcs_recycledump_us ) + " " +
-                   str( lcs_vpc_pchg_repeat ) + " " +
-                   str( lcs_vpc_dchg_us ) + " " +
-                   str( lcs_wastedump_us ) + " " +
-                   str( lcs_vpc_dchg_repeat ) + " " +
+                   str( phenc_conf.cpmg_freq ) + " " +
+                   str( phenc_conf.bstrap_pchg_us ) + " " +
+                   str( phenc_conf.lcs_pchg_us ) + " " +
+                   str( phenc_conf.lcs_dump_us ) + " " +
+                   str( phenc_conf.p90_pchg_us ) + " " +
+                   str( phenc_conf.p90_pchg_refill_us ) + " " +
+                   str( phenc_conf.p90_us ) + " " +
+                   str( phenc_conf.p90_dchg_us ) + " " +
+                   str( phenc_conf.p90_dtcl ) + " " +
+                   str( phenc_conf.p180_pchg_us ) + " " +
+                   str( phenc_conf.p180_pchg_refill_us ) + " " +
+                   str( phenc_conf.p180_us ) + " " +
+                   str( phenc_conf.p180_dchg_us ) + " " +
+                   str( phenc_conf.p180_dtcl ) + " " +
+                   str( phenc_conf.echoshift_us ) + " " +
+                   str( phenc_conf.echotime_us ) + " " +
+                   str( phenc_conf.scanspacing_us ) + " " +
+                   str( phenc_conf.samples_per_echo ) + " " +
+                   str( phenc_conf.echoes_per_scan ) + " " +
+                   str( phenc_conf.n_iterate ) + " " +
+                   str( phenc_conf.ph_cycl_en ) + " " +
+                   str( phenc_conf.dconv_fact ) + " " +
+                   str( phenc_conf.echoskip ) + " " +
+                   str( phenc_conf.echodrop ) + " " +
+                   str( phenc_conf.vvarac ) + " " +
+                   str( phenc_conf.lcs_vpc_pchg_us ) + " " +
+                   str( phenc_conf.lcs_recycledump_us ) + " " +
+                   str( phenc_conf.lcs_vpc_pchg_repeat ) + " " +
+                   str( phenc_conf.lcs_vpc_dchg_us ) + " " +
+                   str( phenc_conf.lcs_wastedump_us ) + " " +
+                   str( phenc_conf.lcs_vpc_dchg_repeat ) + " " +
                    
-                   str( gradz_len_us ) + " " +
-                   str( gradz_volt ) + " " +
+                   str( phenc_conf.gradz_len_us ) + " " +
+                   str( phenc_conf.gradz_volt ) + " " +
                    
-                   str( gradx_len_us ) + " " +
-                   str( gradx_volt ) + " " +
+                   str( phenc_conf.gradx_len_us ) + " " +
+                   str( phenc_conf.gradx_volt ) + " " +
                    
-                   str(grad_refocus) + " " +
-                   str(flip_grad_refocus_sign) + " " +
+                   str( phenc_conf.grad_refocus) + " " +
+                   str( phenc_conf.flip_grad_refocus_sign) + " " +
                    
-                   str( enc_tao_us ) + " " +
+                   str( phenc_conf.enc_tao_us ) + " " +
                    
-                   str(p180_xy_angle) + " " +
+                   str( phenc_conf.p180_xy_angle) + " " +
                    
-                   str(en_lcs_pchg) + " " +
-                   str(en_lcs_dchg)
+                   str( phenc_conf.en_lcs_pchg) + " " +
+                   str( phenc_conf.en_lcs_dchg)
                    
                    )
     

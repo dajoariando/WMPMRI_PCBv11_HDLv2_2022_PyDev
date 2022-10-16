@@ -37,7 +37,8 @@ if not os.path.exists(absdatapath):
 
 # variables
 client_data_folder = absdatapath
-en_fig = 1  # enable figure
+sav_fig = 0 # save figure to a file
+show_fig = 1  # show figures
 meas_time = 0  # measure time
 process_data = 1
 
@@ -144,9 +145,9 @@ if ( process_data ):
     # compute the generated data
     cp_rmt_file( nmrObj.scp, nmrObj.server_data_folder, nmrObj.client_data_folder, "datasum.txt" )
     cp_rmt_file( nmrObj.scp, nmrObj.server_data_folder, nmrObj.client_data_folder, "acqu.par" )
-    # plot_echosum( nmrObj, nmrObj.client_data_folder + "\\" + "datasum.txt", samples_per_echo, echoes_per_scan, en_fig )
+    # plot_echosum( nmrObj, nmrObj.client_data_folder + "\\" + "datasum.txt", samples_per_echo, echoes_per_scan, show_fig )
     
-    compute_multiple( nmrObj, data_parent_folder, meas_folder, file_name_prefix, en_fig, en_ext_param, thetaref, echoref_avg, dconv_lpf_ord, dconv_lpf_cutoff_kHz, ignore_echoes )
+    compute_multiple( nmrObj, data_parent_folder, meas_folder, file_name_prefix, sav_fig, show_fig, en_ext_param, thetaref, echoref_avg, dconv_lpf_ord, dconv_lpf_cutoff_kHz, ignore_echoes )
     
 if ( meas_time ):
     elapsed_time = time.time() - start_time
