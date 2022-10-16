@@ -24,7 +24,7 @@ class phenc_conf_221015():
     p180_dtcl = p90_dtcl
     echoshift_us = 10
     echotime_us = 500
-    scanspacing_us = 120000
+    scanspacing_us = 200000
     samples_per_echo = 4000
     echoes_per_scan = 80
     n_iterate = 2

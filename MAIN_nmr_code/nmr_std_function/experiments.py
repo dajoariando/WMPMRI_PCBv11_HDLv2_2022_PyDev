@@ -18,7 +18,7 @@ def phenc_ReIm ( nmrObj, phenc_conf ):
      # save the current folder
     folder_ext = nmrObj.folder_extension
     
-    # run measurement for the Real part
+    ### run measurement for the Real part
     phenc_conf.p180_xy_angle = 2 # set 1 for x-pulse and 2 for y-pulse for p180
     nmrObj.phenc_t2_iter(phenc_conf)
     # create folder for this measurement
@@ -33,7 +33,7 @@ def phenc_ReIm ( nmrObj, phenc_conf ):
     _, Y_asum_re, Y_asum_im, Y_a0, Y_snr, Y_T2, Y_noise, Y_res, Y_theta, _, _, _ = compute_multiple( nmrObj, phenc_conf, sav_fig, show_fig)
         
     
-    # run measurement for the Imaginary part
+    #### run measurement for the Imaginary part
     phenc_conf.p180_xy_angle = 1 # set 1 for x-pulse and 2 for y-pulse for p180
     nmrObj.phenc_t2_iter(phenc_conf)
     # create folder for this measurement
@@ -49,6 +49,8 @@ def phenc_ReIm ( nmrObj, phenc_conf ):
 
     
     # combine the real and imaginary data
+    #Y_asum_re = 0
+    #X_asum_im = 0
     asum_cmplx = Y_asum_re + 1j*X_asum_im
     
     return asum_cmplx
@@ -69,5 +71,12 @@ def phenc (nmrObj, phenc_conf):
     cp_rmt_file( nmrObj.scp, nmrObj.server_data_folder, indv_datadir, "acqu.par" )
     # post-processing
     _, asum_re, asum_im, a0, snr, T2, noise, res, theta, _, _, _ = compute_multiple( nmrObj, phenc_conf, sav_fig, show_fig)
-    
+    #asum_re= 0
+    #asum_im= 0
+    #a0= 0
+    #snr= 0
+    #T2= 0
+    #noise= 0
+    #res= 0
+    #theta = 0
     return asum_re, asum_im, a0, snr, T2, noise, res, theta

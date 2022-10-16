@@ -45,7 +45,7 @@ from sys_configs.phenc_conf_221015 import phenc_conf_221015
 phenc_conf = phenc_conf_221015()
 
 # modify default parameters
-phenc_conf.n_iterate = 16
+phenc_conf.n_iterate = 2
 phenc_conf.gradz_len_us = 800 # gradient pulse length
 phenc_conf.gradx_len_us = 800 # gradient pulse length
 phenc_conf.enc_tao_us = 1000 # the encoding time
@@ -153,6 +153,7 @@ plt.subplot(1,2,2)
 plt.imshow(np.abs(image),cmap='gray')
 fig.canvas.draw()
 plt.pause(0.01)
+np.savetxt(nmrObj.client_data_folder+"\\kspace.txt",kspace,fmt='%0.6f')
 
 sq_curr = 0 # the concentric square iteration #
 for i in range(0,np.size(idx_list,1)):
@@ -183,6 +184,7 @@ for i in range(0,np.size(idx_list,1)):
         plt.pause(0.01)
         
         plt.savefig( nmrObj.client_data_folder + '\\image.png' )
+        np.savetxt(nmrObj.client_data_folder+"\\kspace.txt",kspace,fmt='%0.6f')
             
     else:
         sq_next = int(idx_list[0,i+1])
@@ -200,6 +202,7 @@ for i in range(0,np.size(idx_list,1)):
             plt.pause(0.01)
             
             plt.savefig( nmrObj.client_data_folder + '\\image.png' )
+            np.savetxt(nmrObj.client_data_folder+"\\kspace.txt",kspace,fmt='%0.6f')
                 
     tmeas.reportTimeSinceLast("############################################################################## cpmg & processing")
 

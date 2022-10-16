@@ -58,6 +58,9 @@ phenc_conf = phenc_conf_221015()
 # run cpmg sequence
 phenc_conf.gradz_volt = 0.1
 phenc_conf.gradx_volt = 0.1
+phenc_conf.gradz_len_us = 100
+phenc_conf.gradx_len_us = 100
+phenc_conf.enc_tao_us = 200
 nmrObj.phenc_t2_iter(phenc_conf)
 
 # report time

@@ -29,16 +29,22 @@ def exec_rmt_ssh_cmd ( ssh, ssh_cmd ):
     # ssh = paramiko.SSHClient()
     # ssh.set_missing_host_key_policy( paramiko.AutoAddPolicy() )
     # ssh.connect( hostname=nmrObj.server_ip , username=nmrObj.ssh_usr, password=nmrObj.ssh_passwd, look_for_keys=False )
-
-    stdin, stdout, stderr = ssh.exec_command( ssh_cmd )
     
-    msg = stdout.read()
-    print(msg)
+    print_error = False
     
-    errmsg = stderr.read()
-    if (errmsg):
-        print(errmsg)
+    if print_error:
+        stdin, stdout, stderr = ssh.exec_command( ssh_cmd )
         
+        msg = stdout.read()
+        print(msg)
+        
+        errmsg = stderr.read()
+        if (errmsg):
+            print(errmsg)
+            
+    else :
+        _, stdout, _ = ssh.exec_command( ssh_cmd )
+            
     stdout.channel.recv_exit_status()  # Blocking call
     
     

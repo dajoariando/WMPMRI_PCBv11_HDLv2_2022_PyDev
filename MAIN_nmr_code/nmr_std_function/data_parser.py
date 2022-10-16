@@ -165,8 +165,8 @@ def read_hex_int32( file_path ):
     # convert data to integer
     data = np.zeros( len( rddata ), dtype='int32' )
     for i in range( len( rddata ) ):
-        # 'L' is unsigned long integer datatype
-        data[i] = struct.unpack( 'L', rddata[i] )[0]
+        # 'L' is unsigned long integer datatype. and 'l' is long integer datatype
+        data[i] = struct.unpack( 'l', rddata[i] )[0]
 
     return data
 
