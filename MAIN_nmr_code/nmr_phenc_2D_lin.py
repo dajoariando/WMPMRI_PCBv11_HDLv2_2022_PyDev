@@ -158,7 +158,7 @@ np.savetxt(nmrObj.client_data_folder+"\\kspace.txt",kspace,fmt='%0.6f')
 sq_curr = 0 # the concentric square iteration #
 for i in range(0,np.size(idx_list,1)):
     
-    nmrObj.folder_extension = ("\\%05d" % (i))
+    nmrObj.folder_extension = ("") # remove the folder extension and use only the data directory to process the data
     
     x = int(idx_list[1,i])
     y = int(idx_list[2,i])

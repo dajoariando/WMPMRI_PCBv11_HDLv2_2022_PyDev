@@ -45,6 +45,10 @@ class nmr_system_2022:
 
         # configure the network
         self.ssh, self.scp = init_ntwrk ( self.server_ip, self.ssh_usr, self.ssh_passwd )
+        
+        # create folder for measurements
+        if not os.path.exists(self.client_data_folder):
+            os.makedirs(self.client_data_folder)
 
     def exit( self ):
         exit_ntwrk ( self.ssh, self.scp )
@@ -241,10 +245,11 @@ class nmr_system_2022:
                    
                    str( phenc_conf.enc_tao_us ) + " " +
                    
-                   str( phenc_conf.p180_xy_angle) + " " +
+                   str( phenc_conf.p180_xy_angle ) + " " +
                    
-                   str( phenc_conf.en_lcs_pchg) + " " +
-                   str( phenc_conf.en_lcs_dchg)
+                   str( phenc_conf.en_lcs_pchg ) + " " +
+                   str( phenc_conf.en_lcs_dchg ) + " " +
+                   str( phenc_conf.exp_num )
                    
                    )
     
