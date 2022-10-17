@@ -92,6 +92,7 @@ def compute_phenc_ReIm__mthread ( nmrObj, phenc_conf, expt_num, x, y, kspace ):
     _, Y_asum_re, Y_asum_im, Y_a0, Y_snr, Y_T2, Y_noise, Y_res, Y_theta, _, _, _ = compute_multiple( nmrObj, phenc_conf, expt_num, sav_fig, show_fig)
     # delete the data to save space
     os.remove(indv_datadir+"\\dsum_%06d.txt" % expt_num)
+    os.remove(indv_datadir+"\\acqu_%06d.par" % expt_num)
         
     # create folder for this measurement
     indv_datadir = nmrObj.client_data_folder + nmrObj.folder_extension
@@ -105,6 +106,7 @@ def compute_phenc_ReIm__mthread ( nmrObj, phenc_conf, expt_num, x, y, kspace ):
     _, X_asum_re, X_asum_im, X_a0, X_snr, X_T2, X_noise, X_res, X_theta, _, _, _ = compute_multiple( nmrObj, phenc_conf, expt_num+1, sav_fig, show_fig)
     # delete the data to save space
     os.remove(indv_datadir+"\\dsum_%06d.txt" % (expt_num+1))
+    os.remove(indv_datadir+"\\acqu_%06d.par" % (expt_num+1))
     
     # combine the real and imaginary data
     kspace[x,y] = Y_asum_re + 1j*X_asum_im

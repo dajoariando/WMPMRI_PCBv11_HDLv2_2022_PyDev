@@ -17,7 +17,7 @@ import matplotlib.pyplot as plt
 import matplotlib
 
 from nmr_std_function.nmr_class import nmr_system_2022
-from nmr_std_function import data_parser
+from nmr_std_function.data_parser import write_text_overwrite
 from nmr_std_function.time_func import time_meas
 from nmr_std_function.expts_functions import phenc,phenc_ReIm,compute_phenc_ReIm__mthread
 from threading import Thread
@@ -31,10 +31,9 @@ datatime = now.strftime("%y%m%d_%H%M%S")
 data_parent_folder = 'D:\\NMR_DATA'
 meas_folder = 'PHENC_2D_'+datatime
 
-# create folder for measurements
+# instantiate nmr object
 client_data_folder = data_parent_folder+'\\'+meas_folder
-if not os.path.exists(client_data_folder):
-    os.makedirs(client_data_folder)
+nmrObj = nmr_system_2022( client_data_folder )
 
 def plot_image_and_save (fig_num, nmrObj, kspace):
     
@@ -78,6 +77,7 @@ phenc_conf.enc_tao_us = 1000 # the encoding time
 imax = 3.0 # maximum current (both polarity will be used)
 npxl = 60 # number of pixels inside the image
 ilist = np.linspace(-imax, imax, npxl) # create list of current being used
+write_text_overwrite( nmrObj.client_data_folder, 'grad_strength.txt', str(ilist))
 
 # modify current list to account for 100mA DC biasing in the gradient circuit
 # the current is 0 when it's set to +/- 0.1V, instead of 0V.
@@ -88,9 +88,6 @@ for idx,v in enumerate(ilist):
         ilist[idx] = v-0.1
     else :
         ilist[idx] = 0.1 # 0.1V means 0.1A to the transistor but 0.0A to the coil, because the other transistor is biased at 0.1A when it's turned off.
-
-# instantiate nmr object
-nmrObj = nmr_system_2022( client_data_folder )
 
 # perform reference scan
 print("\n(Reference scan)" )

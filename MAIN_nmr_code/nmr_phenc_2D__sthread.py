@@ -1,7 +1,7 @@
 '''
-Created on May 24, 2022
-
+Created on Oct 10, 2022
 @author: David Ariando
+Single thread processing for the phase encoding sequence
 
 '''
 
