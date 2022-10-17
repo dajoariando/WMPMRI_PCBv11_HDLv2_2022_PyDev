@@ -42,20 +42,18 @@ class phenc_conf_221015():
     lcs_wastedump_us = 200
     lcs_vpc_dchg_repeat = 2000
     # gradient params
-    gradz_len_us = 800 # gradient pulse length
+    gradz_len_us = 100 # gradient pulse length
     gradz_volt = 0.1 # the gradient can be positive or negative
-    gradx_len_us = 800 # gradient pulse length
+    gradx_len_us = 100 # gradient pulse length
     gradx_volt = 0.1 # the gradient can be positive or negative
     grad_refocus = 1 # put 1 to refocus the gradient
     flip_grad_refocus_sign = 1 # put 1 to flip the gradient refocusing sign
-    enc_tao_us = 1000 # the encoding time
+    enc_tao_us = 200 # the encoding time
     # p180 x-y pulse selection. 
     p180_xy_angle = 2 # set 1 for x-pulse and 2 for y-pulse for p180
     # lcs charging param
     en_lcs_pchg = 1 # enable lcs precharging
     en_lcs_dchg = 1 # enable lcs discharging
-    # experiment number (starts with 0). This will create a different file to speed up processing
-    exp_num = 0
     
     # post-processing parameters
     dconv_lpf_ord = 2  # downconversion order

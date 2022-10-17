@@ -197,7 +197,7 @@ class nmr_system_2022:
         ssh_cmd = self.server_path +'/'+ self.exec_folder +'/'+ command
         exec_rmt_ssh_cmd_in_datadir( self.ssh, ssh_cmd, self.server_data_folder )
     
-    def phenc_t2_iter( self, phenc_conf ):
+    def phenc_t2_iter( self, phenc_conf, expt_num ):
         # execute cpmg sequence
         exec_name = "phenc_t2_iter"
 
@@ -249,7 +249,7 @@ class nmr_system_2022:
                    
                    str( phenc_conf.en_lcs_pchg ) + " " +
                    str( phenc_conf.en_lcs_dchg ) + " " +
-                   str( phenc_conf.exp_num )
+                   str( expt_num )
                    
                    )
     

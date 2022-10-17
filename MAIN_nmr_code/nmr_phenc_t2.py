@@ -21,7 +21,7 @@ from nmr_std_function.ntwrk_functions import cp_rmt_file, cp_rmt_folder, exec_rm
 from nmr_std_function.nmr_functions import plot_echosum
 from nmr_std_function.nmr_functions import compute_multiple
 from nmr_std_function.time_func import time_meas
-from nmr_std_function.experiments import phenc
+from nmr_std_function.expts_functions import phenc
 
 
 # get the current time

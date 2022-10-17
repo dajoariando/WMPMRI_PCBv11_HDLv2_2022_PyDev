@@ -12,11 +12,12 @@ import time
 from datetime import datetime
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib
 
 from nmr_std_function.nmr_class import nmr_system_2022
 from nmr_std_function import data_parser
 from nmr_std_function.time_func import time_meas
-from nmr_std_function.experiments import phenc,phenc_ReIm
+from nmr_std_function.expts_functions import phenc,phenc_ReIm
 
 
 # get current time
@@ -45,14 +46,14 @@ from sys_configs.phenc_conf_221015 import phenc_conf_221015
 phenc_conf = phenc_conf_221015()
 
 # modify default parameters
-phenc_conf.n_iterate = 2
+phenc_conf.n_iterate = 4
 phenc_conf.gradz_len_us = 800 # gradient pulse length
 phenc_conf.gradx_len_us = 800 # gradient pulse length
 phenc_conf.enc_tao_us = 1000 # the encoding time
         
 # set the maximum current and number of pixels 
 imax = 3.0 # maximum current (both polarity will be used)
-npxl = 61 # number of pixels inside the image
+npxl = 60 # number of pixels inside the image
 ilist = np.linspace(-imax, imax, npxl) # create list of current being used
 
 # modify current list to account for 100mA DC biasing in the gradient circuit
@@ -146,20 +147,36 @@ phenc_conf.en_ext_matchfilter = 0 # enable external reference for matched filter
 phenc_conf.echoref_avg = 0 # echo_avg_ref # external parameter: matched filtering echo average
 
 # create figure for kspace and image
+plt.ion()
 fig = plt.figure(25,figsize=(14,7))
+fig.clf()
+
+# maximize window
+plot_backend = matplotlib.get_backend()
+mng = plt.get_current_fig_manager()
+if plot_backend == 'TkAgg':
+    # mng.resize(*mng.window.maxsize())
+    mng.resize( 1500, 700 )
+elif plot_backend == 'wxAgg':
+    mng.frame.Maximize( True )
+elif plot_backend == 'Qt4Agg':
+    mng.window.showMaximized()
+
 plt.subplot(1,2,1)
 plt.imshow(np.abs(kspace),cmap='gray')
 plt.subplot(1,2,2)
 plt.imshow(np.abs(image),cmap='gray')
+plt.tight_layout()
 fig.canvas.draw()
-plt.pause(0.01)
-np.savetxt(nmrObj.client_data_folder+"\\kspace.txt",kspace,fmt='%0.6f')
+fig.canvas.flush_events()
+np.savetxt(nmrObj.client_data_folder+"\\kspace.txt",kspace,fmt='%0.10f')
 
 sq_curr = 0 # the concentric square iteration #
 for i in range(0,np.size(idx_list,1)):
     
     nmrObj.folder_extension = ("") # remove the folder extension and use only the data directory to process the data
     
+    # find the index of the kspace to be measured
     x = int(idx_list[1,i])
     y = int(idx_list[2,i])
     
@@ -168,48 +185,55 @@ for i in range(0,np.size(idx_list,1)):
     phenc_conf.gradx_volt = ilist[y];
         
     # run measurement and process data
-    asum_cmplx = phenc_ReIm(nmrObj, phenc_conf)
+    asum_cmplx = phenc_ReIm(nmrObj, phenc_conf, i*2) # i*2 is due to one experiment for each real and imaginary part in a loop
     kspace[x,y] = asum_cmplx
     
      # draw when one concentric square is finished
     if (i==np.size(idx_list,1)-1): # find if it's the last scan on the list list
+        
+        # invert the kspace to image
         image = np.fft.fftshift(np.fft.fft2(kspace))
         
+        # plot the data
         fig = plt.figure(25)
+        fig.clf()
         plt.subplot(1,2,1)
         plt.imshow(np.abs(kspace),cmap='gray')
         plt.subplot(1,2,2)
         plt.imshow(np.abs(image),cmap='gray')
         fig.canvas.draw()
-        plt.pause(0.01)
+        fig.canvas.flush_events()
         
+        # save the data
         plt.savefig( nmrObj.client_data_folder + '\\image.png' )
-        np.savetxt(nmrObj.client_data_folder+"\\kspace.txt",kspace,fmt='%0.6f')
+        np.savetxt(nmrObj.client_data_folder+"\\kspace.txt",kspace,fmt='%0.10f')
             
     else:
         sq_next = int(idx_list[0,i+1])
         if (sq_curr < sq_next): # find if it's the last scan within one concentric square
             sq_curr = sq_next
             
+            # invert the kspace to image
             image = np.fft.fftshift(np.fft.fft2(kspace))
-        
+            
+            # plot the data
             fig = plt.figure(25)
+            fig.clf()
             plt.subplot(1,2,1)
             plt.imshow(np.abs(kspace),cmap='gray')
             plt.subplot(1,2,2)
             plt.imshow(np.abs(image),cmap='gray')
             fig.canvas.draw()
-            plt.pause(0.01)
+            fig.canvas.flush_events()
             
+            # save the data
             plt.savefig( nmrObj.client_data_folder + '\\image.png' )
-            np.savetxt(nmrObj.client_data_folder+"\\kspace.txt",kspace,fmt='%0.6f')
+            np.savetxt(nmrObj.client_data_folder+"\\kspace.txt",kspace,fmt='%0.10f')
                 
     tmeas.reportTimeSinceLast("############################################################################## cpmg & processing")
 
-plt.show()
- 
 # DUMMY SCAN: discharge power from the lcs
 phenc_conf.en_lcs_pchg = 0
 phenc_conf.en_lcs_dchg = 1
 phenc_conf.p180_xy_angle = 1 # set for X p180 pulse
-nmrObj.phenc_t2_iter( phenc_conf )
+nmrObj.phenc_t2_iter( phenc_conf, 0 )

@@ -29,7 +29,7 @@ def plot_echosum( nmrObj, filepath, samples_per_echo, echoes_per_scan, en_fig ):
     
     plt.show()
     
-def compute_multiple( nmrObj, phenc_conf, sav_fig, show_fig):
+def compute_multiple( nmrObj, phenc_conf, expt_num, sav_fig, show_fig):
 
     # variables to be input
     # data_parent_folder : the folder for all datas
@@ -70,7 +70,7 @@ def compute_multiple( nmrObj, phenc_conf, sav_fig, show_fig):
     file_name_prefix = 'dat_'
     
     # variables from NMR settings
-    ( param_list, value_list ) = data_parser.parse_info( data_folder, 'acqu_%06d.par' % phenc_conf.exp_num )  # read file
+    ( param_list, value_list ) = data_parser.parse_info( data_folder, 'acqu_%06d.par' % expt_num )  # read file
     SpE = int( data_parser.find_value( 'nrPnts', param_list, value_list ) )
     NoE = int( data_parser.find_value( 'nrEchoes', param_list, value_list ) )
     en_ph_cycle_proc = int (data_parser.find_value( 'usePhaseCycle', param_list, value_list ))
@@ -111,7 +111,7 @@ def compute_multiple( nmrObj, phenc_conf, sav_fig, show_fig):
         
     else:
         # read sum data only
-        file_path = ( data_folder + '\\dsum_%06d.txt' % phenc_conf.exp_num )
+        file_path = ( data_folder + '\\dsum_%06d.txt' % expt_num )
         data = np.zeros( NoE * SpE )
 
         if binary_OR_ascii:
