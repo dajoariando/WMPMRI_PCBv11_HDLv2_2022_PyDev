@@ -30,9 +30,9 @@ def exec_rmt_ssh_cmd ( ssh, ssh_cmd ):
     # ssh.set_missing_host_key_policy( paramiko.AutoAddPolicy() )
     # ssh.connect( hostname=nmrObj.server_ip , username=nmrObj.ssh_usr, password=nmrObj.ssh_passwd, look_for_keys=False )
     
-    print_error = False
+    print_C_messages = False
     
-    if print_error:
+    if print_C_messages:
         stdin, stdout, stderr = ssh.exec_command( ssh_cmd )
         
         msg = stdout.read()

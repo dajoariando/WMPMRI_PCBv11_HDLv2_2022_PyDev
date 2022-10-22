@@ -35,7 +35,6 @@ meas_folder = '\\T2_'+datatime
 # variables
 sav_fig = 1 # save figures
 show_fig = 1  # show figures
-process_data = 1 # process the nmr data, otherwise it'll be skipped
 
 # enable time measurement
 tmeas = time_meas(True)
@@ -48,8 +47,8 @@ nmrObj = nmr_system_2022( client_data_folder )
 tmeas.reportTimeSinceLast("### load libraries")
 
 # import default measurement configuration
-from sys_configs.phenc_conf_221015 import phenc_conf_221015
-phenc_conf = phenc_conf_221015()
+from sys_configs.phenc_conf_halbach_v03_221018 import phenc_conf_halbach_v03_221018
+phenc_conf = phenc_conf_halbach_v03_221018()
 
 # modify the experiment parameters
 phenc_conf.gradz_volt = 0.1
@@ -59,6 +58,6 @@ phenc_conf.gradx_len_us = 100
 phenc_conf.enc_tao_us = 200
 
 # run the experiment
-phenc(nmrObj, phenc_conf)
+phenc(nmrObj, phenc_conf, sav_fig, show_fig)
 
 tmeas.reportTimeSinceLast("### processing")

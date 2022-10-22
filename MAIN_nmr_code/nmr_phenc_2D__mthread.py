@@ -64,8 +64,8 @@ en_multithreads = True # enable multithread processing of the data. Otherwise, i
 tmeas = time_meas(report_time)
 
 # import default measurement configuration and modify
-from sys_configs.phenc_conf_221015 import phenc_conf_221015
-phenc_conf = phenc_conf_221015()
+from sys_configs.phenc_conf_halbach_v03_221018 import phenc_conf_halbach_v03_221018
+phenc_conf = phenc_conf_halbach_v03_221018()
 
 # modify default parameters
 phenc_conf.n_iterate = 4
@@ -74,8 +74,8 @@ phenc_conf.gradx_len_us = 800 # gradient pulse length
 phenc_conf.enc_tao_us = 1000 # the encoding time
         
 # set the maximum current and number of pixels 
-imax = 3.0 # maximum current (both polarity will be used)
-npxl = 60 # number of pixels inside the image
+imax = 1.0 # 3.0 # maximum current (both polarity will be used)
+npxl = 20 # 64 # number of pixels inside the image
 ilist = np.linspace(-imax, imax, npxl) # create list of current being used
 write_text_overwrite( nmrObj.client_data_folder, 'grad_strength.txt', str(ilist))
 
@@ -93,7 +93,9 @@ for idx,v in enumerate(ilist):
 print("\n(Reference scan)" )
 nmrObj.folder_extension = "\\ref"
 phenc_conf.en_lcs_dchg = 0 # disable lcs precharging
-_, _, _, _, _, _, _, theta_ref = phenc (nmrObj, phenc_conf)
+sav_fig = 1 # save figure for reference scan
+show_fig = 1 # show figure for reference scan
+_, _, _, _, _, _, _, theta_ref = phenc (nmrObj, phenc_conf, sav_fig, show_fig)
 
 tmeas.reportTimeSinceLast("############################################################################### load libraries and reference scan")
 
@@ -154,6 +156,7 @@ for i in range(0,np.size(idx_list,1)):
 # create kspace vector
 kspace = np.zeros((npxl,npxl),dtype="complex")
 image = np.zeros((npxl,npxl),dtype="complex")
+nacq = npxl*npxl # the number of points in kspace
 
 # settings for measurements
 phenc_conf.en_lcs_pchg = 0 # disable lcs precharging because the vpc is already precharged by the reference scan
@@ -199,6 +202,8 @@ tmeas.reportTimeSinceLast("#####################################################
 sq_curr = 0 # the concentric square iteration #
 threads = [] # list of threads to be joined later on
 for i in range(0,np.size(idx_list,1)):
+    print ("################################################### iter:(%d/%d) -- square:(%d/%d)" %(i,nacq,sq_curr,int(np.ceil(npxl/2))))# print iteration number
+    
     
     nmrObj.folder_extension = ("") # remove the folder extension and use only the data directory to process the data
     
@@ -225,7 +230,7 @@ for i in range(0,np.size(idx_list,1)):
     else:
         compute_phenc_ReIm__mthread(nmrObj, phenc_conf, i*2, x, y, kspace)
                 
-    tmeas.reportTimeSinceLast("############################################################################## cpmg")
+    tmeas.reportTimeSinceLast("############################################################################## cpmg ")
     
     # draw when one concentric square is finished
     if (i==np.size(idx_list,1)-1): # find if it's the last scan on the list list

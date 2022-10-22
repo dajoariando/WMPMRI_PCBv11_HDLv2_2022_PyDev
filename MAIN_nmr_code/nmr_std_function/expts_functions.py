@@ -4,10 +4,8 @@ from nmr_std_function.ntwrk_functions import cp_rmt_file, exec_rmt_ssh_cmd_in_da
 from nmr_std_function.nmr_functions import compute_multiple
 
 # basic phase encoding experiments
-def phenc (nmrObj, phenc_conf):
+def phenc (nmrObj, phenc_conf, sav_fig, show_fig):
     # measurement parameters
-    sav_fig = 1 # disable figure save
-    show_fig = 1 # disable figure show
     expt_num = 0 # experiment number is always 0 for a single experiment
     
     # run the measurement

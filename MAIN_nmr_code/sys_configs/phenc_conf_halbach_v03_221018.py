@@ -1,4 +1,4 @@
-class phenc_conf_221015():
+class phenc_conf_halbach_v03_221018():
 # this configuration is for:
 # halbach8 v02 that contains 30 turns rx solenoid coil, 1 turn gradient coils for x and z, 5 turns tx coil
 
@@ -8,31 +8,31 @@ class phenc_conf_221015():
     p180_p90_fact = 1.6 # multiplication factor between p90 to p180 length
     
     # cpmg settings
-    cpmg_freq = 4.1
+    cpmg_freq = 4.176
     bstrap_pchg_us = 2000
     lcs_pchg_us = 20
     lcs_dump_us = 100
     p90_pchg_us = plen_base
     p90_pchg_refill_us = plen_base*refill_mult
-    p90_us = 10.0
-    p90_dchg_us = 100
+    p90_us = 8.0
+    p90_dchg_us = p90_pchg_us+p90_pchg_refill_us # used to be 150
     p90_dtcl = 0.5
     p180_pchg_us = plen_base *p180_p90_fact
     p180_pchg_refill_us = plen_base*refill_mult*p180_p90_fact
     p180_us = p90_us
-    p180_dchg_us = p90_dchg_us
+    p180_dchg_us = p180_pchg_us+p180_pchg_refill_us # used to be p90_dchg_us
     p180_dtcl = p90_dtcl
-    echoshift_us = 10
-    echotime_us = 500
-    scanspacing_us = 120000
-    samples_per_echo = 4000
-    echoes_per_scan = 80
+    echoshift_us = 5
+    echotime_us = 80# 400
+    scanspacing_us = 100000
+    samples_per_echo = 300 # 300
+    echoes_per_scan = 200 # 80
     n_iterate = 2
     ph_cycl_en = 1 # phase cycle enable
     dconv_fact = 1 # unused for current cpmg code
     echoskip = 1 # unused for current cpmg code
     echodrop = 0 # unused for current cpmg code
-    vvarac = -1.91 # set to -1.91V # more negative, more capacitance
+    vvarac = -1.8 # set to -1.91V # more negative, more capacitance
     # precharging the vpc
     lcs_vpc_pchg_us = 25
     lcs_recycledump_us = 1000
