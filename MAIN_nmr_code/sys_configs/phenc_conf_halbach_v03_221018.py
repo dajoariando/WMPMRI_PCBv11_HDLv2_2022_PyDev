@@ -3,18 +3,18 @@ class phenc_conf_halbach_v03_221018():
 # halbach8 v02 that contains 30 turns rx solenoid coil, 1 turn gradient coils for x and z, 5 turns tx coil
 
     # pulse parameters
-    plen_base = 5.00 # the precharging length base
+    plen_base = 8.00 # the precharging length base
     refill_mult = 0.8 # the refill multiplication to compensate RF loss
     p180_p90_fact = 1.6 # multiplication factor between p90 to p180 length
     
     # cpmg settings
-    cpmg_freq = 4.176
+    cpmg_freq = 4.178
     bstrap_pchg_us = 2000
     lcs_pchg_us = 20
     lcs_dump_us = 100
     p90_pchg_us = plen_base
     p90_pchg_refill_us = plen_base*refill_mult
-    p90_us = 8.0
+    p90_us = 6.0
     p90_dchg_us = p90_pchg_us+p90_pchg_refill_us # used to be 150
     p90_dtcl = 0.5
     p180_pchg_us = plen_base *p180_p90_fact
@@ -22,10 +22,10 @@ class phenc_conf_halbach_v03_221018():
     p180_us = p90_us
     p180_dchg_us = p180_pchg_us+p180_pchg_refill_us # used to be p90_dchg_us
     p180_dtcl = p90_dtcl
-    echoshift_us = 5
-    echotime_us = 80# 400
+    echoshift_us = 6
+    echotime_us = 500# 400
     scanspacing_us = 100000
-    samples_per_echo = 300 # 300
+    samples_per_echo = 500 # 300
     echoes_per_scan = 200 # 80
     n_iterate = 2
     ph_cycl_en = 1 # phase cycle enable
@@ -60,7 +60,13 @@ class phenc_conf_halbach_v03_221018():
     dconv_lpf_cutoff_kHz = 200  # downconversion lpf cutoff
     en_ext_rotation = 0 # enable external reference for echo rotation
     thetaref = 0 # external parameter: echo rotation angle
-    en_conj_matchfilter = 0 # compute matchfiltering with the conjugate (results in absolute value of signal with no imaginary)
     en_ext_matchfilter = 0 # enable external reference for matched filtering
+    en_conj_matchfilter = 0 # compute matchfiltering with the conjugate (results in absolute value of signal with no imaginary)
+    en_self_rotation = 1 # enable self rotation with the angle estimated by its own echo (is automatically disactivated when en_ext_rotation is active
     echoref_avg = 0 # echo_avg_ref # external parameter: matched filtering echo average 
     ignore_echoes = 0 # ignore initial echoes for data processing
+    dual_exp = 0 # enable dual exponential fit. Otherwise, it will be single exponential fit
+    a_est = [30,100] # amplitude estimation for fitting
+    t2_est = [10e-3,200e-3] # t2 estimate for fitting
+    #a_est = [30]
+    #t2_est = [10e-3]

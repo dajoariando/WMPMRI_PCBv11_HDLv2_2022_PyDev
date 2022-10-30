@@ -25,7 +25,7 @@ def init( client_data_folder ):
     return nmrObj
 
 
-def analyze( nmrObj, samp_freq, samples, vvarac, en_filt, min_freq, max_freq, tuning_freq, meas_bw_kHz, continuous, en_fig ):
+def analyze( nmrObj, samp_freq, samples, vvarac, en_filt, min_freq, max_freq, tuning_freq, meas_bw_kHz, filt_ord, continuous, en_fig ):
 
     while True:
         nmrObj.noise( samp_freq, samples, vvarac )
@@ -34,7 +34,7 @@ def analyze( nmrObj, samp_freq, samples, vvarac, en_filt, min_freq, max_freq, tu
         cp_rmt_file( nmrObj.scp, nmrObj.server_data_folder, nmrObj.client_data_folder, "acqu.par" )
 
         # compute_stats( min_freq, max_freq, data_folder, meas_folder[0], 'noise_plot.png', en_fig )
-        compute_in_bw_noise( en_filt, meas_bw_kHz, tuning_freq, min_freq, max_freq, nmrObj.client_data_folder, 'noise_plot.png', en_fig )
+        compute_in_bw_noise( en_filt, meas_bw_kHz, filt_ord, tuning_freq, min_freq, max_freq, nmrObj.client_data_folder, 'noise_plot.png', en_fig )
         
         print("vvarac : ", vvarac, "\n")
         
@@ -54,18 +54,23 @@ def exit( nmrObj ):
     nmrObj.exit()
 
 
+# import default measurement configuration and modify
+from sys_configs.phenc_conf_halbach_v03_221018 import phenc_conf_halbach_v03_221018
+phenc_conf = phenc_conf_halbach_v03_221018()
+
 # uncomment this line to debug the nmr noise code locally here
-samp_freq = 4.1*4  # sampling frequency
+tuning_freq = phenc_conf.cpmg_freq # hardware tuning frequency selector, using lookup table
+samp_freq = tuning_freq*4  # sampling frequency
 samples = 100000  # number of points
-vvarac = 0 # voltage for the preamp (more negative, more capacitance)
-en_filt = False # enable post-processing filter to limit the measurement bandwidth
+vvarac = phenc_conf.vvarac # voltage for the preamp (more negative, more capacitance)
+en_filt = True # enable post-processing filter to limit the measurement bandwidth
 min_freq = 0.001  # in MHz
 max_freq = 8.0  # in MHz
-tuning_freq = 4.1 # hardware tuning frequency selector, using lookup table
-meas_bw_kHz = 200 # downconversion filter bw
+meas_bw_kHz = phenc_conf.dconv_lpf_cutoff_kHz # filter bw
+filt_ord = phenc_conf.dconv_lpf_ord # filter order
 continuous = True  # continuous running at one frequency configuration
 client_data_folder = "D:\\NMR_DATA"
 en_fig = True
 nmrObj = init( client_data_folder )
-analyze( nmrObj, samp_freq, samples, vvarac, en_filt, min_freq, max_freq, tuning_freq, meas_bw_kHz, continuous , en_fig )
+analyze( nmrObj, samp_freq, samples, vvarac, en_filt, min_freq, max_freq, tuning_freq, meas_bw_kHz, filt_ord, continuous , en_fig )
 exit( nmrObj )

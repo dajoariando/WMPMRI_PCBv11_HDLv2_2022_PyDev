@@ -1,7 +1,7 @@
 import os
 
 from nmr_std_function.ntwrk_functions import cp_rmt_file, exec_rmt_ssh_cmd_in_datadir
-from nmr_std_function.nmr_functions import compute_multiple
+from nmr_std_function.nmr_functions import compute_multiple, compute_multiexp
 
 # basic phase encoding experiments
 def phenc (nmrObj, phenc_conf, sav_fig, show_fig):
@@ -19,7 +19,8 @@ def phenc (nmrObj, phenc_conf, sav_fig, show_fig):
     cp_rmt_file( nmrObj.scp, nmrObj.server_data_folder, indv_datadir, "acqu_%06d.par" % expt_num )
     exec_rmt_ssh_cmd_in_datadir ( nmrObj.ssh, "rm dsum_%06d.txt acqu_%06d.par" % (expt_num, expt_num), nmrObj.server_data_folder )
     # post-processing
-    _, asum_re, asum_im, a0, snr, T2, noise, res, theta, _, _, _ = compute_multiple( nmrObj, phenc_conf, expt_num, sav_fig, show_fig)
+    #_, asum_re, asum_im, a0, snr, T2, noise, res, theta, _, _, _ = compute_multiple( nmrObj, phenc_conf, expt_num, sav_fig, show_fig)
+    _, asum_re, asum_im, a0, snr, T2, noise, res, theta, _, _, _ = compute_multiexp( nmrObj, phenc_conf, expt_num, sav_fig, show_fig)
 
     return asum_re, asum_im, a0, snr, T2, noise, res, theta
 
@@ -72,7 +73,7 @@ def phenc_ReIm ( nmrObj, phenc_conf, expt_num ):
     return asum_cmplx
 
 # phase encoding experiment with both x-y p180 to get real (CPMG) and imaginary (CP) data to construct an image. With multithreading
-def compute_phenc_ReIm__mthread ( nmrObj, phenc_conf, expt_num, x, y, kspace ):
+def compute_phenc_ReIm__mthread ( nmrObj, phenc_conf, expt_num, x, y, kspace, kspace_a0 ):
     # post-processing parameters
     sav_fig = 0 # disable figure save
     show_fig = 0 # disable figure show
@@ -108,4 +109,6 @@ def compute_phenc_ReIm__mthread ( nmrObj, phenc_conf, expt_num, x, y, kspace ):
     
     # combine the real and imaginary data
     kspace[x,y] = Y_asum_re + 1j*X_asum_im
+    for i in range(0,len(Y_a0)): # process for multi-exponential at a0
+        kspace_a0[x,y,i] = Y_a0[i]+1j*X_a0[i]
     

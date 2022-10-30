@@ -35,10 +35,10 @@ meas_folder = 'PHENC_2D_'+datatime
 client_data_folder = data_parent_folder+'\\'+meas_folder
 nmrObj = nmr_system_2022( client_data_folder )
 
-def plot_image_and_save (fig_num, nmrObj, kspace):
+def plot_image_and_save (fig_num, nmrObj, kspace, filename):
     
-    # invert the kspace to image
-    image = np.fft.fftshift(np.fft.fft2(kspace))
+    # invert the kspace to image_asum
+    image_asum = np.fft.fftshift(np.fft.fft2(kspace))
     
     # plot the data
     fig = plt.figure(fig_num)
@@ -46,13 +46,13 @@ def plot_image_and_save (fig_num, nmrObj, kspace):
     plt.subplot(1,2,1)
     plt.imshow(np.abs(kspace),cmap='gray')
     plt.subplot(1,2,2)
-    plt.imshow(np.abs(image),cmap='gray')
+    plt.imshow(np.abs(image_asum),cmap='gray')
     fig.canvas.draw()
     fig.canvas.flush_events()
     
     # save the data
-    plt.savefig( nmrObj.client_data_folder + '\\image.png' )
-    np.savetxt(nmrObj.client_data_folder+"\\kspace.txt",kspace,fmt='%0.10f')
+    plt.savefig( nmrObj.client_data_folder + '\\image_%s.png'%filename )
+    np.savetxt(nmrObj.client_data_folder+"\\kspace_%s.txt"%filename,kspace,fmt='%0.10f')
 
 # variables
 sav_fig = False # save figures
@@ -60,6 +60,8 @@ show_fig = False  # show figures
 report_time = True  # measure time
 process_data = True # process the NMR data
 en_multithreads = True # enable multithread processing of the data. Otherwise, it'll be processed sequentially
+
+dual_exp = phenc_conf.dual_exp
 
 tmeas = time_meas(report_time)
 
@@ -74,8 +76,8 @@ phenc_conf.gradx_len_us = 800 # gradient pulse length
 phenc_conf.enc_tao_us = 1000 # the encoding time
         
 # set the maximum current and number of pixels 
-imax = 1.0 # 3.0 # maximum current (both polarity will be used)
-npxl = 20 # 64 # number of pixels inside the image
+imax = 3.0 # 3.0 # maximum current (both polarity will be used)
+npxl = 64 # 64 # number of pixels inside the image_asum
 ilist = np.linspace(-imax, imax, npxl) # create list of current being used
 write_text_overwrite( nmrObj.client_data_folder, 'grad_strength.txt', str(ilist))
 
@@ -92,7 +94,8 @@ for idx,v in enumerate(ilist):
 # perform reference scan
 print("\n(Reference scan)" )
 nmrObj.folder_extension = "\\ref"
-phenc_conf.en_lcs_dchg = 0 # disable lcs precharging
+phenc_conf.en_lcs_pchg = 1 # enable lcs precharging
+phenc_conf.en_lcs_dchg = 0 # enable lcs discharging
 sav_fig = 1 # save figure for reference scan
 show_fig = 1 # show figure for reference scan
 _, _, _, _, _, _, _, theta_ref = phenc (nmrObj, phenc_conf, sav_fig, show_fig)
@@ -152,62 +155,95 @@ for i in range(0,np.size(idx_list,1)):
     # subtract one from all xy indexing due to Python indexing starts with 0, not 1
     idx_list[1,i] -= 1 # subtract x indexing
     idx_list[2,i] -= 1 # subtract y indexing
-    
-# create kspace vector
-kspace = np.zeros((npxl,npxl),dtype="complex")
-image = np.zeros((npxl,npxl),dtype="complex")
-nacq = npxl*npxl # the number of points in kspace
 
-# settings for measurements
-phenc_conf.en_lcs_pchg = 0 # disable lcs precharging because the vpc is already precharged by the reference scan
-phenc_conf.en_lcs_dchg = 0 # disable lcs discharging because the vpc has to maintain its voltage for next scan
+# create kspace_asum vector
+kspace_asum = np.zeros((npxl,npxl),dtype="complex")
+image_asum = np.zeros((npxl,npxl),dtype="complex")
+if dual_exp:
+    kspace_a0 = np.zeros((npxl,npxl,2), dtype="complex")
+    image_a0 = np.zeros((npxl,npxl,2), dtype="complex")
+else:
+    kspace_a0 = np.zeros((npxl,npxl,1), dtype="complex")
+    image_a0 = np.zeros((npxl,npxl,1), dtype="complex")
+nacq = npxl*npxl # the number of points in kspace_asum
 
-# processing parameters    
-phenc_conf.en_ext_rotation = 1 # enable external reference for echo rotation
-phenc_conf.thetaref = theta_ref # external parameter: echo rotation angle
-phenc_conf.en_conj_matchfilter = 0 # disable conjugate matchfiltering because it will auto-rotate the data
-phenc_conf.en_ext_matchfilter = 0 # enable external reference for matched filtering
-phenc_conf.echoref_avg = 0 # echo_avg_ref # external parameter: matched filtering echo average
-
-# create figure for kspace and image
+# create figure for kspace_asum and image_asum
 plt.ion()
-fig_num = 25
-fig = plt.figure(25,figsize=(14,7))
-
+fig_num_asum = 8
+fig_num_a0_1 = 9
+fig_num_a0_2 = 10
+fig = plt.figure(fig_num_asum,figsize=(14,7))
 # maximize window
 plot_backend = matplotlib.get_backend()
 mng = plt.get_current_fig_manager()
 if plot_backend == 'TkAgg':
     # mng.resize(*mng.window.maxsize())
-    mng.resize( 1500, 700 )
+    mng.resize( 800, 400 )
+elif plot_backend == 'wxAgg':
+    mng.frame.Maximize( True )
+elif plot_backend == 'Qt4Agg':
+    mng.window.showMaximized()
+    
+fig = plt.figure(fig_num_a0_1,figsize=(14,7))
+# maximize window
+plot_backend = matplotlib.get_backend()
+mng = plt.get_current_fig_manager()
+if plot_backend == 'TkAgg':
+    # mng.resize(*mng.window.maxsize())
+    mng.resize( 800, 400 )
 elif plot_backend == 'wxAgg':
     mng.frame.Maximize( True )
 elif plot_backend == 'Qt4Agg':
     mng.window.showMaximized()
 
-# plot image from kspace and save data
-plot_image_and_save (fig_num, nmrObj, kspace)
+if dual_exp:
+    fig = plt.figure(fig_num_a0_2,figsize=(14,7))
+    # maximize window
+    plot_backend = matplotlib.get_backend()
+    mng = plt.get_current_fig_manager()
+    if plot_backend == 'TkAgg':
+        # mng.resize(*mng.window.maxsize())
+        mng.resize( 800, 400 )
+    elif plot_backend == 'wxAgg':
+        mng.frame.Maximize( True )
+    elif plot_backend == 'Qt4Agg':
+        mng.window.showMaximized()
+
+# plot image_asum from kspace_asum and save data
+plot_image_and_save (fig_num_asum, nmrObj, kspace_asum, "asum")
+plot_image_and_save (fig_num_a0_1, nmrObj, kspace_a0[:,:,0], "a0")
+if (dual_exp):
+    plot_image_and_save (fig_num_a0_2, nmrObj, kspace_a0[:,:,1], "a1")
+
+# settings for measurements
+phenc_conf.en_lcs_pchg = 0 # disable lcs precharging because the vpc is already precharged by the reference scan
+phenc_conf.en_lcs_dchg = 0 # disable lcs discharging because the vpc has to maintain its voltage for next scan
 
 # post-processing parameters for the phase encoding imaging
 phenc_conf.en_ext_rotation = 1 # enable external reference for echo rotation
-phenc_conf.thetaref = phenc_conf.thetaref # external parameter: echo rotation angle
+phenc_conf.thetaref = theta_ref # external parameter: echo rotation angle
 phenc_conf.en_conj_matchfilter = 0 # disable conjugate matchfiltering because it will auto-rotate the data
 phenc_conf.en_ext_matchfilter = 0 # enable external reference for matched filtering
 phenc_conf.echoref_avg = 0 # echo_avg_ref # external parameter: matched filtering echo average
 sav_fig = 0 # disable figure save
 show_fig = 0 # disable figure show
 
+# run dummy scan to remove first acquisition T1 difference with the others
+print("\n(Dummy scan)" )
+nmrObj.folder_extension = ("\\dummy")
+_, _, _, _, _, _, _, _ = phenc (nmrObj, phenc_conf, sav_fig, show_fig)
+
 tmeas.reportTimeSinceLast("############################################################################## pre-cpmg")
 
 sq_curr = 0 # the concentric square iteration #
 threads = [] # list of threads to be joined later on
 for i in range(0,np.size(idx_list,1)):
-    print ("################################################### iter:(%d/%d) -- square:(%d/%d)" %(i,nacq,sq_curr,int(np.ceil(npxl/2))))# print iteration number
+    print ("################################################### iter:(%d/%d) -- square:(%d/%d)" %(i+1,nacq,sq_curr+1,int(np.ceil(npxl/2))))# print iteration number
     
     
     nmrObj.folder_extension = ("") # remove the folder extension and use only the data directory to process the data
     
-    # find the index of the kspace to be measured
+    # find the index of the kspace_asum to be measured
     x = int(idx_list[1,i])
     y = int(idx_list[2,i])
     
@@ -224,23 +260,26 @@ for i in range(0,np.size(idx_list,1)):
     
     # start detached processing of the data to let another cpmg run without interruption
     if en_multithreads:
-        process = Thread(target=compute_phenc_ReIm__mthread, args=[nmrObj, phenc_conf, i*2, x, y, kspace])
+        process = Thread(target=compute_phenc_ReIm__mthread, args=[nmrObj, phenc_conf, i*2, x, y, kspace_asum, kspace_a0])
         process.start()
         threads.append(process)
     else:
-        compute_phenc_ReIm__mthread(nmrObj, phenc_conf, i*2, x, y, kspace)
+        compute_phenc_ReIm__mthread(nmrObj, phenc_conf, i*2, x, y, kspace_asum, kspace_a0)
                 
     tmeas.reportTimeSinceLast("############################################################################## cpmg ")
     
     # draw when one concentric square is finished
-    if (i==np.size(idx_list,1)-1): # find if it's the last scan on the list list
+    if (i==np.size(idx_list,1)-1): # find if it's the last scan on the list
         if en_multithreads:
             # collect all running processes
             for thread in threads:
                 thread.join()
         
-        # plot image from kspace and save data
-        plot_image_and_save (fig_num, nmrObj, kspace)
+        # plot image_asum from kspace_asum and save data
+        plot_image_and_save (fig_num_asum, nmrObj, kspace_asum, "asum_%05d" % (idx_list[0,i]))
+        plot_image_and_save (fig_num_a0_1, nmrObj, kspace_a0[:,:,0], "a0_%05d" %(idx_list[0,i]))
+        if (dual_exp):
+            plot_image_and_save (fig_num_a0_2, nmrObj, kspace_a0[:,:,1], "a1%05d" %(idx_list[0,i]))
         
         tmeas.reportTimeSinceLast("############################################################################## plot and save data")
 
@@ -254,8 +293,11 @@ for i in range(0,np.size(idx_list,1)):
                 for thread in threads:
                     thread.join()
             
-            # plot image from kspace and save data
-            plot_image_and_save (fig_num, nmrObj, kspace)
+            # plot image_asum from kspace_asum and save data
+            plot_image_and_save (fig_num_asum, nmrObj, kspace_asum, "asum_%05d" % (idx_list[0,i]))
+            plot_image_and_save (fig_num_a0_1, nmrObj, kspace_a0[:,:,0], "a0_%05d" % (idx_list[0,i]))
+            if (dual_exp):
+                plot_image_and_save (fig_num_a0_2, nmrObj, kspace_a0[:,:,1], "a1_%05d" % (idx_list[0,i]))
             
             tmeas.reportTimeSinceLast("############################################################################## plot and save data")
  
