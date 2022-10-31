@@ -1,7 +1,7 @@
 import os
 
 from nmr_std_function.ntwrk_functions import cp_rmt_file, exec_rmt_ssh_cmd_in_datadir
-from nmr_std_function.nmr_functions import compute_multiple, compute_multiexp
+from nmr_std_function.nmr_functions import compute_multiexp
 
 # basic phase encoding experiments
 def phenc (nmrObj, phenc_conf, sav_fig, show_fig):
@@ -20,9 +20,9 @@ def phenc (nmrObj, phenc_conf, sav_fig, show_fig):
     exec_rmt_ssh_cmd_in_datadir ( nmrObj.ssh, "rm dsum_%06d.txt acqu_%06d.par" % (expt_num, expt_num), nmrObj.server_data_folder )
     # post-processing
     #_, asum_re, asum_im, a0, snr, T2, noise, res, theta, _, _, _ = compute_multiple( nmrObj, phenc_conf, expt_num, sav_fig, show_fig)
-    _, asum_re, asum_im, a0, snr, T2, noise, res, theta, _, _, _ = compute_multiexp( nmrObj, phenc_conf, expt_num, sav_fig, show_fig)
+    _, asum_re, asum_im, a0, snr, T2, noise, res, theta, _, echo_avg, _ = compute_multiexp( nmrObj, phenc_conf, expt_num, sav_fig, show_fig)
 
-    return asum_re, asum_im, a0, snr, T2, noise, res, theta
+    return asum_re, asum_im, a0, snr, T2, noise, res, theta, echo_avg
 
 # phase encoding experiment with both x-y p180 to get real (CPMG) and imaginary (CP) data to construct an image
 def phenc_ReIm ( nmrObj, phenc_conf, expt_num ):
@@ -88,7 +88,8 @@ def compute_phenc_ReIm__mthread ( nmrObj, phenc_conf, expt_num, x, y, kspace, ks
     cp_rmt_file( nmrObj.scp, nmrObj.server_data_folder, indv_datadir, "acqu_%06d.par" % expt_num )
     exec_rmt_ssh_cmd_in_datadir ( nmrObj.ssh, "rm dsum_%06d.txt acqu_%06d.par" % (expt_num, expt_num), nmrObj.server_data_folder )
     # post-processing
-    _, Y_asum_re, Y_asum_im, Y_a0, Y_snr, Y_T2, Y_noise, Y_res, Y_theta, _, _, _ = compute_multiple( nmrObj, phenc_conf, expt_num, sav_fig, show_fig)
+    #_, Y_asum_re, Y_asum_im, Y_a0, Y_snr, Y_T2, Y_noise, Y_res, Y_theta, _, _, _ = compute_multiple( nmrObj, phenc_conf, expt_num, sav_fig, show_fig)
+    _, Y_asum_re, Y_asum_im, Y_a0, Y_snr, Y_T2, Y_noise, Y_res, Y_theta, _, _, _ = compute_multiexp( nmrObj, phenc_conf, expt_num, sav_fig, show_fig)
     # delete the data to save space
     os.remove(indv_datadir+"\\dsum_%06d.txt" % expt_num)
     os.remove(indv_datadir+"\\acqu_%06d.par" % expt_num)
@@ -102,7 +103,8 @@ def compute_phenc_ReIm__mthread ( nmrObj, phenc_conf, expt_num, x, y, kspace, ks
     cp_rmt_file( nmrObj.scp, nmrObj.server_data_folder, indv_datadir, "acqu_%06d.par" % (expt_num+1) )
     exec_rmt_ssh_cmd_in_datadir ( nmrObj.ssh, "rm dsum_%06d.txt acqu_%06d.par" % (expt_num+1, expt_num+1), nmrObj.server_data_folder )
     # post-processing
-    _, X_asum_re, X_asum_im, X_a0, X_snr, X_T2, X_noise, X_res, X_theta, _, _, _ = compute_multiple( nmrObj, phenc_conf, expt_num+1, sav_fig, show_fig)
+    # _, X_asum_re, X_asum_im, X_a0, X_snr, X_T2, X_noise, X_res, X_theta, _, _, _ = compute_multiple( nmrObj, phenc_conf, expt_num+1, sav_fig, show_fig)
+    _, X_asum_re, X_asum_im, X_a0, X_snr, X_T2, X_noise, X_res, X_theta, _, _, _ = compute_multiexp( nmrObj, phenc_conf, expt_num+1, sav_fig, show_fig)
     # delete the data to save space
     os.remove(indv_datadir+"\\dsum_%06d.txt" % (expt_num+1))
     os.remove(indv_datadir+"\\acqu_%06d.par" % (expt_num+1))
@@ -111,4 +113,3 @@ def compute_phenc_ReIm__mthread ( nmrObj, phenc_conf, expt_num, x, y, kspace, ks
     kspace[x,y] = Y_asum_re + 1j*X_asum_im
     for i in range(0,len(Y_a0)): # process for multi-exponential at a0
         kspace_a0[x,y,i] = Y_a0[i]+1j*X_a0[i]
-    

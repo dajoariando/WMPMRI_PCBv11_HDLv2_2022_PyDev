@@ -61,6 +61,8 @@ report_time = True  # measure time
 process_data = True # process the NMR data
 en_multithreads = True # enable multithread processing of the data. Otherwise, it'll be processed sequentially
 
+# dual_exp = phenc_conf.dual_exp
+
 tmeas = time_meas(report_time)
 
 # import default measurement configuration and modify
@@ -159,6 +161,12 @@ n_exp = len(phenc_conf.a_est) # get the exponential #
 # create kspace_asum vector
 kspace_asum = np.zeros((npxl,npxl),dtype="complex")
 image_asum = np.zeros((npxl,npxl),dtype="complex")
+#if dual_exp:
+#    kspace_a0 = np.zeros((npxl,npxl,2), dtype="complex")
+#    image_a0 = np.zeros((npxl,npxl,2), dtype="complex")
+#else:
+#    kspace_a0 = np.zeros((npxl,npxl,1), dtype="complex")
+#    image_a0 = np.zeros((npxl,npxl,1), dtype="complex")
 kspace_a0 = np.zeros((npxl,npxl,n_exp), dtype="complex")
 image_a0 = np.zeros((npxl,npxl,n_exp), dtype="complex")
 nacq = npxl*npxl # the number of points in kspace_asum
@@ -166,6 +174,8 @@ nacq = npxl*npxl # the number of points in kspace_asum
 # create figure for kspace_asum and image_asum
 plt.ion()
 fig_num_asum = 10
+#fig_num_a0_1 = 11
+#fig_num_a0_2 = 12
 
 # create figure and maximize it
 fig = plt.figure(fig_num_asum,figsize=(14,7))
@@ -179,10 +189,36 @@ elif plot_backend == 'wxAgg':
 elif plot_backend == 'Qt4Agg':
     mng.window.showMaximized()
 
+# create figure and maximize it    
+#fig = plt.figure(fig_num_a0_1,figsize=(14,7))
+#plot_backend = matplotlib.get_backend()
+#mng = plt.get_current_fig_manager()
+#if plot_backend == 'TkAgg':
+#    # mng.resize(*mng.window.maxsize())
+#    mng.resize( 800, 400 )
+#elif plot_backend == 'wxAgg':
+#    mng.frame.Maximize( True )
+#elif plot_backend == 'Qt4Agg':
+#    mng.window.showMaximized()
+
+#if dual_exp:
+#    fig = plt.figure(fig_num_a0_2,figsize=(14,7))
+#    # maximize window
+#    plot_backend = matplotlib.get_backend()
+#    mng = plt.get_current_fig_manager()
+#    if plot_backend == 'TkAgg':
+#        # mng.resize(*mng.window.maxsize())
+#        mng.resize( 800, 400 )
+#    elif plot_backend == 'wxAgg':
+#        mng.frame.Maximize( True )
+#    elif plot_backend == 'Qt4Agg':
+#        mng.window.showMaximized()
 
 # plot image_asum from kspace_asum and save data
 plot_image_and_save (fig_num_asum, nmrObj, kspace_asum, "asum")
-
+#plot_image_and_save (fig_num_a0_1, nmrObj, kspace_a0[:,:,0], "a0")
+#if (dual_exp):
+#    plot_image_and_save (fig_num_a0_2, nmrObj, kspace_a0[:,:,1], "a1")
 
 # settings for measurements
 phenc_conf.en_lcs_pchg = 0 # disable lcs precharging because the vpc is already precharged by the reference scan
@@ -246,6 +282,9 @@ for i in range(0,np.size(idx_list,1)):
         
         # plot image_asum from kspace_asum and save data
         plot_image_and_save (fig_num_asum, nmrObj, kspace_asum, "asum_%05d" % (idx_list[0,i]))
+#        plot_image_and_save (fig_num_a0_1, nmrObj, kspace_a0[:,:,0], "a0_%05d" %(idx_list[0,i]))
+#        if (dual_exp):
+#            plot_image_and_save (fig_num_a0_2, nmrObj, kspace_a0[:,:,1], "a1%05d" %(idx_list[0,i]))
         
         tmeas.reportTimeSinceLast("############################################################################## plot and save data")
 
@@ -261,6 +300,9 @@ for i in range(0,np.size(idx_list,1)):
             
             # plot image_asum from kspace_asum and save data
             plot_image_and_save (fig_num_asum, nmrObj, kspace_asum, "asum_%05d" % (idx_list[0,i]))
+#            plot_image_and_save (fig_num_a0_1, nmrObj, kspace_a0[:,:,0], "a0_%05d" % (idx_list[0,i]))
+#            if (dual_exp):
+#                plot_image_and_save (fig_num_a0_2, nmrObj, kspace_a0[:,:,1], "a1_%05d" % (idx_list[0,i]))
             
             tmeas.reportTimeSinceLast("############################################################################## plot and save data")
  

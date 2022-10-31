@@ -8,7 +8,7 @@ class phenc_conf_halbach_v03_221018():
     p180_p90_fact = 1.6 # multiplication factor between p90 to p180 length
     
     # cpmg settings
-    cpmg_freq = 4.178
+    cpmg_freq = 4.163
     bstrap_pchg_us = 2000
     lcs_pchg_us = 20
     lcs_dump_us = 100
@@ -65,8 +65,8 @@ class phenc_conf_halbach_v03_221018():
     en_self_rotation = 1 # enable self rotation with the angle estimated by its own echo (is automatically disactivated when en_ext_rotation is active
     echoref_avg = 0 # echo_avg_ref # external parameter: matched filtering echo average 
     ignore_echoes = 0 # ignore initial echoes for data processing
-    dual_exp = 0 # enable dual exponential fit. Otherwise, it will be single exponential fit
-    a_est = [30,100] # amplitude estimation for fitting
-    t2_est = [10e-3,200e-3] # t2 estimate for fitting
-    #a_est = [30]
-    #t2_est = [10e-3]
+    # dual_exp = 0 # enable dual exponential fit. Otherwise, it will be single exponential fit
+    # a_est = [30,100] # amplitude estimation for fitting
+    # t2_est = [10e-3,200e-3] # t2 estimate for fitting
+    a_est = [30]
+    t2_est = [10e-3]

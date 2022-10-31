@@ -19,7 +19,6 @@ from nmr_std_function.data_parser import parse_simple_info
 from nmr_std_function.nmr_class import nmr_system_2022
 from nmr_std_function.ntwrk_functions import cp_rmt_file, cp_rmt_folder, exec_rmt_ssh_cmd_in_datadir
 from nmr_std_function.nmr_functions import plot_echosum
-from nmr_std_function.nmr_functions import compute_multiple
 from nmr_std_function.time_func import time_meas
 from nmr_std_function.expts_functions import phenc
 
