@@ -68,14 +68,14 @@ from sys_configs.phenc_conf_halbach_v03_221018 import phenc_conf_halbach_v03_221
 phenc_conf = phenc_conf_halbach_v03_221018()
 
 # modify default parameters
-phenc_conf.n_iterate = 4
+phenc_conf.n_iterate = 2
 phenc_conf.gradz_len_us = 800 # gradient pulse length
 phenc_conf.gradx_len_us = 800 # gradient pulse length
 phenc_conf.enc_tao_us = 1000 # the encoding time
         
 # set the maximum current and number of pixels 
-imax = 0.75 # 3.0 # maximum current (both polarity will be used)
-npxl = 16 # 64 # number of pixels inside the image_asum
+imax = 3.0 # 3.0 # maximum current (both polarity will be used)
+npxl = 64 # 64 # number of pixels inside the image_asum
 ilist = np.linspace(-imax, imax, npxl) # create list of current being used
 write_text_overwrite( nmrObj.client_data_folder, 'grad_strength.txt', str(ilist))
 
@@ -269,3 +269,6 @@ phenc_conf.en_lcs_pchg = 0
 phenc_conf.en_lcs_dchg = 1
 phenc_conf.p180_xy_angle = 1 # set for X p180 pulse
 nmrObj.phenc_t2_iter( phenc_conf, 0 )
+
+# clean up
+nmrObj.exit()

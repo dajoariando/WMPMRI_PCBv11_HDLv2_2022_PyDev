@@ -60,3 +60,6 @@ phenc_conf.enc_tao_us = 200
 phenc(nmrObj, phenc_conf, sav_fig, show_fig)
 
 tmeas.reportTimeSinceLast("### processing")
+
+# clean up
+nmrObj.exit()

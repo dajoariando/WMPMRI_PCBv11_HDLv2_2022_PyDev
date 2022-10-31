@@ -6,7 +6,8 @@ def init_ntwrk ( server_ip, ssh_usr, ssh_passwd ):
 
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy( paramiko.AutoAddPolicy() )
-    ssh.connect( hostname=server_ip , username=ssh_usr, password=ssh_passwd, look_for_keys=False )
+    # ssh.connect( hostname=server_ip , username=ssh_usr, password=ssh_passwd, look_for_keys=False )
+    ssh.connect( hostname=server_ip , username=ssh_usr, password=ssh_passwd, look_for_keys=False, banner_timeout=60 ) # set timeout to 60s in case of congested network
 
     scp = SCPClient( ssh.get_transport() )
 
