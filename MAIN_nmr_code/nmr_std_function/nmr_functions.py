@@ -58,7 +58,7 @@ def compute_multiexp( nmrObj, phenc_conf, expt_num, sav_fig, show_fig):
     ignore_echoes = phenc_conf.ignore_echoes
     a_est = phenc_conf.a_est
     t2_est = phenc_conf.t2_est
-    
+    dconv_f = phenc_conf.dconv_f
     
     # variables local to this function the setting file for the measurement
     mtch_fltr_sta_idx = 0  # 0 is default or something referenced to SpE, e.g. SpE/4; the start index for match filtering is to neglect ringdown part from calculation 
@@ -78,7 +78,10 @@ def compute_multiexp( nmrObj, phenc_conf, expt_num, sav_fig, show_fig):
     en_ph_cycle_proc = int (data_parser.find_value( 'usePhaseCycle', param_list, value_list ))
     tE = data_parser.find_value( 'echoTimeRun', param_list, value_list )
     Sf = data_parser.find_value( 'adcFreq', param_list, value_list ) * 1e6
-    Df = data_parser.find_value( 'b1Freq', param_list, value_list ) * 1e6
+    if (dconv_f>0): # set the Df to dconv_f if it's set to a particular value, or get the Df from B1 excitation if it's not set (0).
+        Df = dconv_f * 1e6
+    else:  
+        Df = data_parser.find_value( 'b1Freq', param_list, value_list ) * 1e6
     total_scan = int( data_parser.find_value( 'nrIterations', param_list, value_list ) )
     echo_skip = data_parser.find_value( 'echoSkipHw', param_list, value_list )
 
@@ -148,7 +151,7 @@ def compute_multiexp( nmrObj, phenc_conf, expt_num, sav_fig, show_fig):
             plt.ylabel( 'probe voltage (uV)' )
         else:
             plt.ylabel( 'adc out (digit)' )
-        plt.savefig( data_folder + '\\decay_raw.png' )
+        plt.savefig( data_folder + '\\decay_raw_%06d.png' % expt_num )
 
     # raw average data
     echo_rawavg = np.zeros( SpE, dtype = float )
@@ -167,7 +170,7 @@ def compute_multiexp( nmrObj, phenc_conf, expt_num, sav_fig, show_fig):
         else:
             plt.ylabel( 'adc out (digit)' )
         plt.legend()
-        plt.savefig( data_folder + '\\echo_avg.png' )
+        plt.savefig( data_folder + '\\echo_avg_%06d.png' % expt_num )
 
     # filter the data
     data_filt = np.zeros( ( NoE, SpE ), dtype = complex )
@@ -209,7 +212,7 @@ def compute_multiexp( nmrObj, phenc_conf, expt_num, sav_fig, show_fig):
             plt.ylabel( 'probe voltage (uV)' )
         else:
             plt.ylabel( 'adc out (digit)' )
-        plt.savefig( data_folder + '\\decay_filt.png' )
+        plt.savefig( data_folder + '\\decay_filt_%06d.png' % expt_num )
 
     # find echo average, echo magnitude
     echo_avg = np.zeros( SpE, dtype = complex )
@@ -220,9 +223,9 @@ def compute_multiexp( nmrObj, phenc_conf, expt_num, sav_fig, show_fig):
     if sav_fig:  # plot echo shape
         plt.figure( 3 )
         plt.clf()
+        plt.plot( tacq, np.real( echo_avg ), '--', label = 'real' )
+        plt.plot( tacq, np.imag( echo_avg ), '--', label = 'imag' )
         plt.plot( tacq, np.abs( echo_avg ), label = 'abs' )
-        plt.plot( tacq, np.real( echo_avg ), label = 'real part' )
-        plt.plot( tacq, np.imag( echo_avg ), label = 'imag part' )
         plt.xlim( 0, max( tacq ) )
         plt.title( "Echo Shape" )
         plt.xlabel( 'time(uS)' )
@@ -231,7 +234,7 @@ def compute_multiexp( nmrObj, phenc_conf, expt_num, sav_fig, show_fig):
         else:
             plt.ylabel( 'adc out (digit)' )
         plt.legend()
-        plt.savefig( data_folder + '\\echo_shape.png' )
+        plt.savefig( data_folder + '\\echo_shape_%06d.png' % expt_num )
         
         if sav_indv_dat:
             data_parser.write_text_overwrite( data_folder, "\\echo_shape.txt", "format: abs, real, imag, time_us" )
@@ -244,6 +247,7 @@ def compute_multiexp( nmrObj, phenc_conf, expt_num, sav_fig, show_fig):
         plt.figure( 4 )
         plt.clf()
         zf = 10  # zero filling factor to get smooth curve. Factor 1 means the resulting vector length is added by the amount of the original vector length itself.
+        spect_xlim_fact = 30 # range of the spectrum to be shown (higher number means larger spectrum bandwidth)
         if zf>0: # process zero filling
             ws = 2 * np.pi / ( tacq[1] - tacq[0] )  # in MHz
             wvect = np.linspace( -ws / 2, ws / 2, len( tacq ) * zf )
@@ -257,15 +261,16 @@ def compute_multiexp( nmrObj, phenc_conf, expt_num, sav_fig, show_fig):
             spect =  ( np.fft.fftshift( np.fft.fft( np.fft.ifftshift( echo_avg ) ) ) )
             spect = spect / len(spect)
             
-        plt.plot( wvect / ( 2 * np.pi ), np.real( spect ), label = 'real' )
-        plt.plot( wvect / ( 2 * np.pi ), np.imag( spect ), label = 'imag' )
-        plt.xlim( 10 / max( tacq ) * -1, 10 / max( tacq ) * 1 )
+        plt.plot( wvect / ( 2 * np.pi ), np.real( spect ), '--', label = 'real' )
+        plt.plot( wvect / ( 2 * np.pi ), np.imag( spect ), '--', label = 'imag' )
+        plt.plot( wvect / ( 2 * np.pi ), np.abs( spect ), label = 'abs' )
+        plt.xlim( spect_xlim_fact / max( tacq ) * -1, spect_xlim_fact / max( tacq ) * 1 )
         plt.title( "Echo spectrum. " + "Peak:real@{:0.2f}kHz,abs@{:0.2f}kHz".format( wvect[np.abs( np.real( spect ) ) == max( 
             np.abs( np.real( spect ) ) )][0] / ( 2 * np.pi ) * 1e3, wvect[np.abs( spect ) == max( np.abs( spect ) )][0] / ( 2 * np.pi ) * 1e3 ) )
         plt.xlabel( 'offset frequency(MHz)' )
         plt.ylabel( 'Echo amplitude (a.u.)' )
         plt.legend()
-        plt.savefig( data_folder + '\\echo_spect.png' )
+        plt.savefig( data_folder + '\\echo_spect_%06d.png' % expt_num )
         
         if sav_indv_dat:
             data_parser.write_text_overwrite( data_folder, "\\echo_spect.txt", "format: real, imag, freq_MHz" )
@@ -337,6 +342,7 @@ def compute_multiexp( nmrObj, phenc_conf, expt_num, sav_fig, show_fig):
         a0 = np.zeros(len(a_est), dtype=float)
         T2 = np.zeros(len(t2_est), dtype=float)
         
+        f = 0
         noise = 0
         res = 0
         snr = 0
@@ -358,7 +364,7 @@ def compute_multiexp( nmrObj, phenc_conf, expt_num, sav_fig, show_fig):
             plt.ylabel( 'probe voltage (uV)' )
         else:
             plt.ylabel( 'adc out (digit)' )
-        plt.savefig( data_folder + '\\decay_sum.png' )
+        plt.savefig( data_folder + '\\decay_sum_%06d.png' % expt_num )
         
         if sav_indv_dat:
             data_parser.write_text_overwrite( data_folder, "\\decay_sum.txt", "output params: noise std: %0.5f, res std: %0.5f, snr_imag: %0.3f, snr_res: %0.3f, a0: %s, T2: %s ms. Format: a_real, a_imag, fit, time(s) " % ( noise, res, snr_imag, snr_res, np.array_str(a0,precision=2), np.array_str(T2*1e3,precision=2) ) )          

@@ -69,7 +69,7 @@ def down_conv( s, k, tE, Df, Sf, dconv_lpf_ord, dconv_lpf_cutoff_Hz ):
     if not simp_dconv:  # normal downconversion
         # downconversion at Nyquist rate or higher
         sReal = s * np.cos( 2 * math.pi * Df * t )
-        sImag = s * np.sin( 2 * math.pi * Df * t )
+        sImag = s * np.sin( 2 * math.pi * Df * t ) * (-1)
     else:  # simulated downconversion happened in FPGA
          # echo is assumed to always start at phase 0. It is true if the pulse
          # length and delay length for pi and 2pi pulse is multiplication of 4

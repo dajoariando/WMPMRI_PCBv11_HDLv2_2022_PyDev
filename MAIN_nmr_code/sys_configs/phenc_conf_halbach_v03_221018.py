@@ -3,18 +3,18 @@ class phenc_conf_halbach_v03_221018():
 # halbach8 v02 that contains 30 turns rx solenoid coil, 1 turn gradient coils for x and z, 5 turns tx coil
 
     # pulse parameters
-    plen_base = 8.00 # the precharging length base
-    refill_mult = 0.8 # the refill multiplication to compensate RF loss
+    plen_base = 4.40 # 8.00, 2.00, 1.00 # the precharging length base
+    refill_mult = 1.0 # the refill multiplication to compensate RF loss
     p180_p90_fact = 1.6 # multiplication factor between p90 to p180 length
     
     # cpmg settings
-    cpmg_freq = 4.154
+    cpmg_freq = 4.164 # in MHz
     bstrap_pchg_us = 2000
     lcs_pchg_us = 20
     lcs_dump_us = 100
     p90_pchg_us = plen_base
     p90_pchg_refill_us = plen_base*refill_mult
-    p90_us = 6.0
+    p90_us = 10.0 # 6.00, 18.00, 24.00
     p90_dchg_us = p90_pchg_us+p90_pchg_refill_us # used to be 150
     p90_dtcl = 0.5
     p180_pchg_us = plen_base *p180_p90_fact
@@ -23,10 +23,10 @@ class phenc_conf_halbach_v03_221018():
     p180_dchg_us = p180_pchg_us+p180_pchg_refill_us # used to be p90_dchg_us
     p180_dtcl = p90_dtcl
     echoshift_us = 6
-    echotime_us = 100# 400
+    echotime_us = 500# 400
     scanspacing_us = 100000
-    samples_per_echo = 300 # 300
-    echoes_per_scan = 300 # 80
+    samples_per_echo = 4000 # 300
+    echoes_per_scan = 100 # 80
     n_iterate = 2
     ph_cycl_en = 1 # phase cycle enable
     dconv_fact = 1 # unused for current cpmg code
@@ -56,8 +56,9 @@ class phenc_conf_halbach_v03_221018():
     en_lcs_dchg = 1 # enable lcs discharging
     
     # post-processing parameters
+    dconv_f = 0 # in MHz. when set to 0, the downconversion local oscillator is set to be B1 freq. When set the other value, the downconversion losc is just the set value.
     dconv_lpf_ord = 2  # downconversion order
-    dconv_lpf_cutoff_kHz = 200  # downconversion lpf cutoff
+    dconv_lpf_cutoff_kHz = 500  # downconversion lpf cutoff
     en_ext_rotation = 0 # enable external reference for echo rotation
     thetaref = 0 # external parameter: echo rotation angle
     en_ext_matchfilter = 0 # enable external reference for matched filtering
@@ -68,5 +69,6 @@ class phenc_conf_halbach_v03_221018():
     # dual_exp = 0 # enable dual exponential fit. Otherwise, it will be single exponential fit
     # a_est = [30,100] # amplitude estimation for fitting
     # t2_est = [10e-3,200e-3] # t2 estimate for fitting
-    a_est = [30]
-    t2_est = [10e-3]
+    a_est = [30] # array of amplitude estimate for fitting
+    t2_est = [10e-3] # array of t2 estimate for fitting
+    

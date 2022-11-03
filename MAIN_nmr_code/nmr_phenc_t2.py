@@ -32,6 +32,7 @@ data_parent_folder = 'D:\\NMR_DATA'
 meas_folder = '\\T2_'+datatime
 
 # variables
+expt_num = 0 # set to 0 for a single experiment
 sav_fig = 1 # save figures
 show_fig = 1  # show figures
 
@@ -57,7 +58,7 @@ phenc_conf.gradx_len_us = 100
 phenc_conf.enc_tao_us = 200
 
 # run the experiment
-phenc(nmrObj, phenc_conf, sav_fig, show_fig)
+phenc(nmrObj, phenc_conf, expt_num, sav_fig, show_fig)
 
 tmeas.reportTimeSinceLast("### processing")
 

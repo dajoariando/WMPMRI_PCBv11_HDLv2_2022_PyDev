@@ -94,10 +94,9 @@ print("\n(Reference scan)" )
 nmrObj.folder_extension = "\\ref"
 phenc_conf.en_lcs_pchg = 1 # enable lcs precharging
 phenc_conf.en_lcs_dchg = 0 # enable lcs discharging
-expt_num = 0 # set to 0 for a single experiment
 sav_fig = 1 # save figure for reference scan
 show_fig = 1 # show figure for reference scan
-_, _, _, _, _, _, _, theta_ref, echo_avg = phenc (nmrObj, phenc_conf, expt_num, sav_fig, show_fig)
+_, _, _, _, _, _, _, theta_ref, echo_avg = phenc (nmrObj, phenc_conf, sav_fig, show_fig)
 
 tmeas.reportTimeSinceLast("############################################################################### load libraries and reference scan")
 
@@ -201,8 +200,7 @@ show_fig = 0 # disable figure show
 # run dummy scan to remove first acquisition T1 difference with the others
 print("\n(Dummy scan)" )
 nmrObj.folder_extension = ("\\dummy")
-expt_num = 0 # set to 0 for dummy scan
-_, _, _, _, _, _, _, _, _ = phenc (nmrObj, phenc_conf, expt_num, sav_fig, show_fig)
+_, _, _, _, _, _, _, _, _ = phenc (nmrObj, phenc_conf, sav_fig, show_fig)
 
 tmeas.reportTimeSinceLast("############################################################################## pre-cpmg")
 
