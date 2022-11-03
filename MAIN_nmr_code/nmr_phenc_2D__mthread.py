@@ -179,7 +179,7 @@ elif plot_backend == 'wxAgg':
     mng.frame.Maximize( True )
 elif plot_backend == 'Qt4Agg':
     mng.window.showMaximized()
-
+#plt.switch_backend('agg')
 
 # plot image_asum from kspace_asum and save data
 plot_image_and_save (fig_num_asum, nmrObj, kspace_asum, "asum")

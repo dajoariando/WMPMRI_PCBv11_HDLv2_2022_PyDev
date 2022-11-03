@@ -4,11 +4,11 @@ class phenc_conf_halbach_v03_221018():
 
     # pulse parameters
     plen_base = 4.40 # 8.00, 2.00, 1.00 # the precharging length base
-    refill_mult = 1.0 # the refill multiplication to compensate RF loss
+    refill_mult = 0.8 # the refill multiplication to compensate RF loss
     p180_p90_fact = 1.6 # multiplication factor between p90 to p180 length
     
     # cpmg settings
-    cpmg_freq = 4.164 # in MHz
+    cpmg_freq = 4.179 # in MHz
     bstrap_pchg_us = 2000
     lcs_pchg_us = 20
     lcs_dump_us = 100
@@ -23,11 +23,11 @@ class phenc_conf_halbach_v03_221018():
     p180_dchg_us = p180_pchg_us+p180_pchg_refill_us # used to be p90_dchg_us
     p180_dtcl = p90_dtcl
     echoshift_us = 6
-    echotime_us = 500# 400
+    echotime_us = 60# 400
     scanspacing_us = 100000
-    samples_per_echo = 4000 # 300
-    echoes_per_scan = 100 # 80
-    n_iterate = 2
+    samples_per_echo = 160 # 300
+    echoes_per_scan = 60 # 80
+    n_iterate =  2
     ph_cycl_en = 1 # phase cycle enable
     dconv_fact = 1 # unused for current cpmg code
     echoskip = 1 # unused for current cpmg code
@@ -58,7 +58,7 @@ class phenc_conf_halbach_v03_221018():
     # post-processing parameters
     dconv_f = 0 # in MHz. when set to 0, the downconversion local oscillator is set to be B1 freq. When set the other value, the downconversion losc is just the set value.
     dconv_lpf_ord = 2  # downconversion order
-    dconv_lpf_cutoff_kHz = 500  # downconversion lpf cutoff
+    dconv_lpf_cutoff_kHz = 200  # downconversion lpf cutoff
     en_ext_rotation = 0 # enable external reference for echo rotation
     thetaref = 0 # external parameter: echo rotation angle
     en_ext_matchfilter = 0 # enable external reference for matched filtering
