@@ -3,6 +3,48 @@ import os
 from nmr_std_function.ntwrk_functions import cp_rmt_file, exec_rmt_ssh_cmd_in_datadir, init_ntwrk, exit_ntwrk
 from nmr_std_function.nmr_functions import compute_multiexp
 
+# basic cpmg experiments
+def cpmg (nmrObj, phenc_conf, expt_num, sav_fig, show_fig):
+    # measurement parameters
+    # expt_num = 0 # experiment number is always 0 for a single experiment
+    
+    # run the measurement
+    nmrObj.cpmg_t2_iter(phenc_conf, expt_num)
+    
+    indv_datadir = nmrObj.client_data_folder + nmrObj.folder_extension
+    if not os.path.exists(indv_datadir):
+        os.makedirs(indv_datadir)
+    # transfer the data to local folder and delete remote files
+    cp_rmt_file( nmrObj.scp, nmrObj.server_data_folder, indv_datadir, "dsum_%06d.txt" % expt_num )
+    cp_rmt_file( nmrObj.scp, nmrObj.server_data_folder, indv_datadir, "acqu_%06d.par" % expt_num )
+    exec_rmt_ssh_cmd_in_datadir ( nmrObj.ssh, "rm dsum_%06d.txt acqu_%06d.par" % (expt_num, expt_num), nmrObj.server_data_folder )
+    # post-processing
+    #_, asum_re, asum_im, a0, snr, T2, noise, res, theta, _, _, _ = compute_multiple( nmrObj, phenc_conf, expt_num, sav_fig, show_fig)
+    _, asum_re, asum_im, a0, snr, T2, noise, res, theta, _, echo_avg, _ = compute_multiexp( nmrObj, phenc_conf, expt_num, sav_fig, show_fig )
+
+    return asum_re, asum_im, a0, snr, T2, noise, res, theta, echo_avg
+
+# basic cpmg experiments with current mode
+def cpmg_cmode (nmrObj, phenc_conf, expt_num, sav_fig, show_fig):
+    # measurement parameters
+    # expt_num = 0 # experiment number is always 0 for a single experiment
+    
+    # run the measurement
+    nmrObj.cpmg_cmode_t2_iter(phenc_conf, expt_num)
+    
+    indv_datadir = nmrObj.client_data_folder + nmrObj.folder_extension
+    if not os.path.exists(indv_datadir):
+        os.makedirs(indv_datadir)
+    # transfer the data to local folder and delete remote files
+    cp_rmt_file( nmrObj.scp, nmrObj.server_data_folder, indv_datadir, "dsum_%06d.txt" % expt_num )
+    cp_rmt_file( nmrObj.scp, nmrObj.server_data_folder, indv_datadir, "acqu_%06d.par" % expt_num )
+    exec_rmt_ssh_cmd_in_datadir ( nmrObj.ssh, "rm dsum_%06d.txt acqu_%06d.par" % (expt_num, expt_num), nmrObj.server_data_folder )
+    # post-processing
+    #_, asum_re, asum_im, a0, snr, T2, noise, res, theta, _, _, _ = compute_multiple( nmrObj, phenc_conf, expt_num, sav_fig, show_fig)
+    _, asum_re, asum_im, a0, snr, T2, noise, res, theta, _, echo_avg, _ = compute_multiexp( nmrObj, phenc_conf, expt_num, sav_fig, show_fig )
+
+    return asum_re, asum_im, a0, snr, T2, noise, res, theta, echo_avg
+
 # basic phase encoding experiments
 def phenc (nmrObj, phenc_conf, expt_num, sav_fig, show_fig):
     # measurement parameters

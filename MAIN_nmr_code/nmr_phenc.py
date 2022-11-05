@@ -29,7 +29,7 @@ datatime = now.strftime("%y%m%d_%H%M%S")
 
 # create folder for measurements
 data_parent_folder = 'D:\\NMR_DATA'
-meas_folder = '\\T2_'+datatime
+meas_folder = '\\phenc_'+datatime
 
 # variables
 expt_num = 0 # set to 0 for a single experiment

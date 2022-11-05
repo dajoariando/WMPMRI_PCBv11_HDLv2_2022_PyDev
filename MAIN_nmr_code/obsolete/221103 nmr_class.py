@@ -53,9 +53,81 @@ class nmr_system_2022:
     def exit( self ):
         exit_ntwrk ( self.ssh, self.scp )
 
+    def cpmg_t2( self, cpmg_freq,
+        bstrap_pchg_us,
+        lcs_pchg_us,
+        lcs_dump_us,
+        p90_pchg_us,
+        p90_pchg_refill_us,
+        p90_us,
+        p90_dchg_us,
+        p90_dtcl,
+        p180_pchg_us,
+        p180_pchg_refill_us,
+        p180_us,
+        p180_dchg_us,
+        p180_dtcl,
+        echoshift_us,
+        echotime_us,
+        scanspacing_us,
+        samples_per_echo,
+        echoes_per_scan,
+        n_iterate,
+        p180_ph_sel,
+        dconv_fact,
+        echoskip,
+        echodrop,
+        vvarac,
+        lcs_vpc_pchg_us,
+        lcs_recycledump_us,
+        lcs_vpc_pchg_repeat, 
+        lcs_vpc_dchg_us,
+        lcs_wastedump_us,
+        lcs_vpc_dchg_repeat    
+    ):
+        # execute cpmg sequence
+        exec_name = "cpmg_t2"
+
+        command = ( exec_name + " " +
+                   str( cpmg_freq ) + " " +
+                   str( bstrap_pchg_us ) + " " +
+                   str( lcs_pchg_us ) + " " +
+                   str( lcs_dump_us ) + " " +
+                   str( p90_pchg_us ) + " " +
+                   str( p90_pchg_refill_us ) + " " +
+                   str( p90_us ) + " " +
+                   str( p90_dchg_us ) + " " +
+                   str( p90_dtcl ) + " " +
+                   str( p180_pchg_us ) + " " +
+                   str( p180_pchg_refill_us ) + " " +
+                   str( p180_us ) + " " +
+                   str( p180_dchg_us ) + " " +
+                   str( p180_dtcl ) + " " +
+                   str( echoshift_us ) + " " +
+                   str( echotime_us ) + " " +
+                   str( scanspacing_us ) + " " +
+                   str( samples_per_echo ) + " " +
+                   str( echoes_per_scan ) + " " +
+                   str( n_iterate ) + " " +
+                   str( p180_ph_sel ) + " " +
+                   str( dconv_fact ) + " " +
+                   str( echoskip ) + " " +
+                   str( echodrop ) + " " +
+                   str( vvarac ) + " " +
+                   str( lcs_vpc_pchg_us ) + " " +
+                   str( lcs_recycledump_us ) + " " +
+                   str( lcs_vpc_pchg_repeat ) + " " +
+                   str( lcs_vpc_dchg_us ) + " " +
+                   str( lcs_wastedump_us ) + " " +
+                   str( lcs_vpc_dchg_repeat )
+                   )
+
+        ssh_cmd = self.server_path +'/'+ self.exec_folder +'/'+ command
+        exec_rmt_ssh_cmd_in_datadir( self.ssh, ssh_cmd, self.server_data_folder )
+
     def cpmg_t2_iter( self, cpmg_conf, expt_num ):
         # execute cpmg sequence
-        exec_name = "cpmg"
+        exec_name = "cpmg_t2_iter"
 
         command = ( exec_name + " " +
                    str( cpmg_conf.cpmg_freq ) + " " +
@@ -69,51 +141,6 @@ class nmr_system_2022:
                    str( cpmg_conf.p90_dtcl ) + " " +
                    str( cpmg_conf.p180_pchg_us ) + " " +
                    str( cpmg_conf.p180_pchg_refill_us ) + " " +
-                   str( cpmg_conf.p180_us ) + " " +
-                   str( cpmg_conf.p180_dchg_us ) + " " +
-                   str( cpmg_conf.p180_dtcl ) + " " +
-                   str( cpmg_conf.echoshift_us ) + " " +
-                   str( cpmg_conf.echotime_us ) + " " +
-                   str( cpmg_conf.scanspacing_us ) + " " +
-                   str( cpmg_conf.samples_per_echo ) + " " +
-                   str( cpmg_conf.echoes_per_scan ) + " " +
-                   str( cpmg_conf.n_iterate ) + " " +
-                   str( cpmg_conf.ph_cycl_en ) + " " +
-                   str( cpmg_conf.dconv_fact ) + " " +
-                   str( cpmg_conf.echoskip ) + " " +
-                   str( cpmg_conf.echodrop ) + " " +
-                   str( cpmg_conf.vvarac ) + " " +
-                   str( cpmg_conf.lcs_vpc_pchg_us ) + " " +
-                   str( cpmg_conf.lcs_recycledump_us ) + " " +
-                   str( cpmg_conf.lcs_vpc_pchg_repeat ) + " " +
-                   str( cpmg_conf.lcs_vpc_dchg_us ) + " " +
-                   str( cpmg_conf.lcs_wastedump_us ) + " " +
-                   str( cpmg_conf.lcs_vpc_dchg_repeat ) + " " +
-                   str( cpmg_conf.gradz_volt ) + " " +
-                   str( cpmg_conf.gradx_volt ) + " " +
-                   str( cpmg_conf.en_lcs_pchg ) + " " +
-                   str( cpmg_conf.en_lcs_dchg ) + " " +
-                   str( expt_num )
-                   )
-    
-        ssh_cmd = self.server_path +'/'+ self.exec_folder +'/'+ command
-        exec_rmt_ssh_cmd_in_datadir( self.ssh, ssh_cmd, self.server_data_folder )
-        
-    def cpmg_cmode_t2_iter( self, cpmg_conf, expt_num ):
-        # execute cpmg sequence
-        exec_name = "cpmg_cmode"
-
-        command = ( exec_name + " " +
-                   str( cpmg_conf.cpmg_freq ) + " " +
-                   str( cpmg_conf.bstrap_pchg_us ) + " " +
-                   str( cpmg_conf.lcs_pchg_us ) + " " +
-                   str( cpmg_conf.lcs_dump_us ) + " " +
-                   str( cpmg_conf.p90_pchg_us ) + " " +
-                   str( cpmg_conf.p90_us ) + " " +
-                   str( cpmg_conf.p90_dchg_us ) + " " +
-                   str( cpmg_conf.p90_dtcl ) + " " +
-                   str( cpmg_conf.p180_1st_pchg_us ) + " " +
-                   str( cpmg_conf.p180_pchg_us ) + " " +
                    str( cpmg_conf.p180_us ) + " " +
                    str( cpmg_conf.p180_dchg_us ) + " " +
                    str( cpmg_conf.p180_dtcl ) + " " +
