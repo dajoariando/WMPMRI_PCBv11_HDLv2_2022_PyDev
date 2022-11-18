@@ -3,6 +3,8 @@ Created on May 24, 2022
 
 @author: David Ariando
 
+cmode uses a single lcs precharging before pi-pulse and then lcs is never discharged, therefore significantly reduces the echo-time
+
 '''
 
 #!/usr/bin/python

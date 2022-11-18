@@ -8,7 +8,7 @@ class phenc_conf_halbach_v03_221104_cmode():
     p180_pchg_us = 2.0
     
     # cpmg settings
-    cpmg_freq = 4.179 # in MHz
+    cpmg_freq = 4.176 # in MHz
     bstrap_pchg_us = 2000
     lcs_pchg_us = 20
     lcs_dump_us = 100
@@ -22,8 +22,8 @@ class phenc_conf_halbach_v03_221104_cmode():
     echotime_us = 25# 400
     scanspacing_us = 400000
     samples_per_echo = 160 # 300
-    echoes_per_scan = 40 # 80
-    n_iterate =  100
+    echoes_per_scan = 60 # 80
+    n_iterate =  2
     ph_cycl_en = 1 # phase cycle enable
     dconv_fact = 1 # unused for current cpmg code
     echoskip = 1 # unused for current cpmg code
@@ -46,7 +46,7 @@ class phenc_conf_halbach_v03_221104_cmode():
     flip_grad_refocus_sign = 1 # put 1 to flip the gradient refocusing sign
     enc_tao_us = 200 # the encoding time
     # p180 x-y pulse selection. 
-    p180_xy_angle = 2 # set 1 for x-pulse and 2 for y-pulse for p180
+    # p180_xy_angle = 2 # set 1 for x-pulse and 2 for y-pulse for p180
     # lcs charging param
     en_lcs_pchg = 1 # enable lcs precharging
     en_lcs_dchg = 1 # enable lcs discharging

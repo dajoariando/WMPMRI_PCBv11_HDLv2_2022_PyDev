@@ -22,11 +22,11 @@ class phenc_conf_halbach_v03_221018():
     p180_us = p90_us
     p180_dchg_us = p180_pchg_us+p180_pchg_refill_us # used to be p90_dchg_us
     p180_dtcl = p90_dtcl
-    echoshift_us = 6
-    echotime_us = 300# 400
+    echoshift_us = 7
+    echotime_us = 70# 400
     scanspacing_us = 100000
-    samples_per_echo = 1000 # 300
-    echoes_per_scan = 300 # 80
+    samples_per_echo = 200 # 300
+    echoes_per_scan = 1000 # 80
     n_iterate =  2
     ph_cycl_en = 1 # phase cycle enable
     dconv_fact = 1 # unused for current cpmg code
