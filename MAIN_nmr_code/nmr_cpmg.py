@@ -47,8 +47,8 @@ nmrObj = nmr_system_2022( client_data_folder )
 tmeas.reportTimeSinceLast("### load libraries")
 
 # import default measurement configuration
-from sys_configs.phenc_conf_halbach_v03_221018 import phenc_conf_halbach_v03_221018
-phenc_conf = phenc_conf_halbach_v03_221018()
+from sys_configs.phenc_conf_halbach_v03_230323 import phenc_conf_halbach_v03_230323
+phenc_conf = phenc_conf_halbach_v03_230323()
 
 # modify the experiment parameters
 phenc_conf.gradz_volt = 0.1

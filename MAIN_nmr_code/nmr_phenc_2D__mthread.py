@@ -64,8 +64,8 @@ en_multithreads = True # enable multithread processing of the data. Otherwise, i
 tmeas = time_meas(report_time)
 
 # import default measurement configuration and modify
-from sys_configs.phenc_conf_halbach_v03_221018 import phenc_conf_halbach_v03_221018
-phenc_conf = phenc_conf_halbach_v03_221018()
+from sys_configs.phenc_conf_halbach_v03_230323 import phenc_conf_halbach_v03_230323
+phenc_conf = phenc_conf_halbach_v03_230323()
 
 # modify default parameters
 phenc_conf.n_iterate = 2
@@ -74,8 +74,8 @@ phenc_conf.gradx_len_us = 800 # gradient pulse length
 phenc_conf.enc_tao_us = 1000 # the encoding time
         
 # set the maximum current and number of pixels 
-imax = 3.0 # 3.0 # maximum current (both polarity will be used)
-npxl = 64 # 64 # number of pixels inside the image_asum
+imax = 3.0/64*40 # 3.0 # maximum current (both polarity will be used)
+npxl = 40 # 64 # number of pixels inside the image_asum
 ilist = np.linspace(-imax, imax, npxl) # create list of current being used
 write_text_overwrite( nmrObj.client_data_folder, 'grad_strength.txt', str(ilist))
 

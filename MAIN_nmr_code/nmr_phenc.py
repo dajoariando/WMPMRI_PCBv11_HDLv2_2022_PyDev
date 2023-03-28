@@ -53,9 +53,9 @@ phenc_conf = phenc_conf_halbach_v03_221018()
 # modify the experiment parameters
 phenc_conf.gradz_volt = 0.1
 phenc_conf.gradx_volt = 0.1
-phenc_conf.gradz_len_us = 100
-phenc_conf.gradx_len_us = 100
-phenc_conf.enc_tao_us = 200
+phenc_conf.gradz_len_us = 200
+phenc_conf.gradx_len_us = 200
+phenc_conf.enc_tao_us = 2000
 
 # run the experiment
 phenc(nmrObj, phenc_conf, expt_num, sav_fig, show_fig)

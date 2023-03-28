@@ -48,13 +48,13 @@ nmrObj = nmr_system_2022( client_data_folder )
 tmeas.reportTimeSinceLast("### load libraries")
 
 # import default measurement configuration
-from sys_configs.phenc_conf_halbach_v03_221018 import phenc_conf_halbach_v03_221018
-phenc_conf = phenc_conf_halbach_v03_221018()
+from sys_configs.phenc_conf_halbach_v03_230323 import phenc_conf_halbach_v03_230323
+phenc_conf = phenc_conf_halbach_v03_230323()
 
 # sweep frequency
 val_center = phenc_conf.cpmg_freq
-val_span = 0.05 # the span of the value, half of this value is negative to center, and half is positive to the center
-val_npts = 51
+val_span = 0.01 # the span of the value, half of this value is negative to center, and half is positive to the center
+val_npts = 11
 val_sw = np.linspace(val_center-0.5*val_span,val_center+0.5*val_span,val_npts)
 
 # modify the experiment parameters
