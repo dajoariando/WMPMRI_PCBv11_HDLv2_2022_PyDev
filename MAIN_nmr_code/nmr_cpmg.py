@@ -50,13 +50,6 @@ tmeas.reportTimeSinceLast("### load libraries")
 from sys_configs.phenc_conf_halbach_v03_230323 import phenc_conf_halbach_v03_230323
 phenc_conf = phenc_conf_halbach_v03_230323()
 
-# modify the experiment parameters
-phenc_conf.gradz_volt = 0.1
-phenc_conf.gradx_volt = 0.1
-phenc_conf.gradz_len_us = 100
-phenc_conf.gradx_len_us = 100
-phenc_conf.enc_tao_us = 200
-
 # run the experiment
 cpmg(nmrObj, phenc_conf, expt_num, sav_fig, show_fig)
 

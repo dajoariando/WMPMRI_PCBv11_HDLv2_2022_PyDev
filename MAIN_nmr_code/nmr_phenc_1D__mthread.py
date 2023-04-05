@@ -19,7 +19,7 @@ import matplotlib
 from nmr_std_function.nmr_class import nmr_system_2022
 from nmr_std_function.data_parser import write_text_overwrite
 from nmr_std_function.time_func import time_meas
-from nmr_std_function.expts_functions import phenc,compute_phenc_ReIm_2D__mthread
+from nmr_std_function.expts_functions import phenc,compute_phenc_ReIm_1D__mthread
 from threading import Thread
 
 
@@ -29,7 +29,7 @@ datatime = now.strftime("%y%m%d_%H%M%S")
 
 # measurements folder settings
 data_parent_folder = 'D:\\NMR_DATA'
-meas_folder = 'PHENC_2D_'+datatime
+meas_folder = 'PHENC_1D_'+datatime
 
 # instantiate nmr object
 client_data_folder = data_parent_folder+'\\'+meas_folder
@@ -39,22 +39,22 @@ def plot_image_and_save (fig_num, nmrObj, kspace, filename):
     
     # kspace increase resolution
     res_xpand = 128
-    kspace_xpand = np.zeros([res_xpand, res_xpand], dtype=complex)
-    kspace_xpand[(res_xpand>>1)-(len(kspace)>>1):(res_xpand>>1)+(len(kspace)>>1),(res_xpand>>1)-(len(kspace)>>1):(res_xpand>>1)+(len(kspace)>>1)] = kspace
+    kspace_xpand = np.zeros(res_xpand, dtype=complex)
+    kspace_xpand[(res_xpand>>1)-(len(kspace)>>1):(res_xpand>>1)+(len(kspace)>>1)] = kspace
     
     # to keep kspace resolution the same as input
     # kspace_xpand = kspace
     
     # invert the kspace to image_asum
-    image_asum = np.fft.fftshift(np.fft.fft2(kspace_xpand))
+    image_asum = np.fft.fftshift(np.fft.fft(kspace_xpand))
     
     # plot the data
     fig = plt.figure(fig_num)
     fig.clf()
     plt.subplot(1,2,1)
-    plt.imshow(np.abs(kspace),cmap='gray')
+    plt.plot(np.abs(kspace))
     plt.subplot(1,2,2)
-    plt.imshow(np.abs(image_asum),cmap='gray')
+    plt.plot(np.abs(image_asum))
     fig.canvas.draw()
     fig.canvas.flush_events()
     
@@ -82,10 +82,14 @@ phenc_conf.gradx_len_us = 800 # gradient pulse length
 phenc_conf.enc_tao_us = 1000 # the encoding time
         
 # set the maximum current and number of pixels
-npxl = 4 # 64 # number of pixels inside the image_asum
+npxl = 8 # 64 # number of pixels inside the image_asum
 imax = 3.0/64*npxl # maximum current with 3A corresponds to 64 pixels (both polarity will be used)
 ilist = np.linspace(-imax, imax, npxl) # create list of current being used
 write_text_overwrite( nmrObj.client_data_folder, 'grad_strength.txt', str(ilist))
+
+# set the sweep gradient (ideally, only one is enabled because this is 1D imaging)
+gx_sw = True;
+gz_sw = False;
 
 # modify current list to account for 100mA DC biasing in the gradient circuit
 # the current is 0 when it's set to +/- 0.1V, instead of 0V.
@@ -109,68 +113,14 @@ _, _, _, _, _, _, _, theta_ref, echo_avg = phenc (nmrObj, phenc_conf, expt_num, 
 
 tmeas.reportTimeSinceLast("############################################################################### load libraries and reference scan")
 
-# create index list with 3 width, 1 for concentric square number (layer number of the concentric square from the middle), 2 and 3 for index of the square
-idx_list = np.zeros((3,npxl*npxl),dtype='int')
-
-# create a concentric square pattern from the middle
-idx_start = int(np.ceil(npxl/2)) # set the starting index, which is half of index max
-if (npxl % 2) == 0: # for even npxl
-    idx_tgt = idx_start+1
-else: # for odd npxl
-    idx_tgt = idx_start
-
-# loop for generating concentric square from the middle
-idx_list_n = 0
-for i in range(0, idx_start):
-    idx = idx_start-i # it should start with idx_start, but python range isn't giving idx_start from range()
-    
-    for idx_n in range(idx, idx_tgt+1):
-        
-        idx_list[0,idx_list_n] = i
-        idx_list[1,idx_list_n] = idx_n
-        idx_list[2,idx_list_n] = idx
-        idx_list_n = idx_list_n + 1
-
-    if idx != idx_tgt:        
-        for idx_n in range(idx, idx_tgt+1):
-            
-            idx_list[0,idx_list_n] = i
-            idx_list[1,idx_list_n] = idx_n
-            idx_list[2,idx_list_n] = idx_tgt
-            idx_list_n = idx_list_n + 1
-        
-    for idx_n in range(idx+1,idx_tgt):
-        
-        idx_list[0,idx_list_n] = i
-        idx_list[1,idx_list_n] = idx
-        idx_list[2,idx_list_n] = idx_n
-        idx_list_n = idx_list_n + 1
-    
-    for idx_n in range(idx+1,idx_tgt):
-    
-        idx_list[0,idx_list_n] = i
-        idx_list[1,idx_list_n] = idx_tgt
-        idx_list[2,idx_list_n] = idx_n
-        idx_list_n = idx_list_n + 1
-        
-    idx_tgt = idx_tgt + 1
-    
-
-for i in range(0,np.size(idx_list,1)):
-    if False: # print the index list for viewing purpose
-        print(idx_list[:,i])
-    # subtract one from all xy indexing due to Python indexing starts with 0, not 1
-    idx_list[1,i] -= 1 # subtract x indexing
-    idx_list[2,i] -= 1 # subtract y indexing
-
-n_exp = len(phenc_conf.a_est) # get the exponential #
-
+# get the exponential #
+n_exp = len(phenc_conf.a_est) 
 # create kspace_asum vector
-kspace_asum = np.zeros((npxl,npxl),dtype="complex")
-image_asum = np.zeros((npxl,npxl),dtype="complex")
-kspace_a0 = np.zeros((npxl,npxl,n_exp), dtype="complex")
-image_a0 = np.zeros((npxl,npxl,n_exp), dtype="complex")
-nacq = npxl*npxl # the number of points in kspace_asum
+kspace_asum = np.zeros(npxl,dtype="complex")
+image_asum = np.zeros(npxl,dtype="complex")
+kspace_a0 = np.zeros((npxl,n_exp), dtype="complex")
+image_a0 = np.zeros((npxl,n_exp), dtype="complex")
+nacq = 1*npxl # the number of points in kspace_asum
 
 # create figure for kspace_asum and image_asum
 plt.ion()
@@ -216,19 +166,22 @@ tmeas.reportTimeSinceLast("#####################################################
 
 sq_curr = 0 # the concentric square iteration #
 threads = [] # list of threads to be joined later on
-for i in range(0,np.size(idx_list,1)):
-    print ("################################################### iter:(%d/%d) -- square:(%d/%d)" %(i+1,nacq,sq_curr+1,int(np.ceil(npxl/2))))# print iteration number
+for i in range(0,np.size(ilist)):
+    print ("################################################### iter:(%d/%d)" %(i+1,nacq))# print iteration number
     
     
     nmrObj.folder_extension = ("") # remove the folder extension and use only the data directory to process the data
-    
-    # find the index of the kspace_asum to be measured
-    x = int(idx_list[1,i])
-    y = int(idx_list[2,i])
+
     
     # set gradient strength
-    phenc_conf.gradz_volt = ilist[x];
-    phenc_conf.gradx_volt = ilist[y];
+    if gz_sw:
+        phenc_conf.gradz_volt = ilist[i];
+    else:
+        phenc_conf.gradz_volt = 0.1; # 0.1 is the bias current and counteracts the opposite current and effectively disables the gradient
+    if gx_sw:
+        phenc_conf.gradx_volt = ilist[i];
+    else:
+        phenc_conf.gradx_volt = 0.1; # 0.1 is the bias current and counteracts the opposite current and effectively disables the gradient
         
     # run experiment to get real part
     phenc_conf.p180_xy_angle = 2 # set 1 for x-pulse and 2 for y-pulse for p180
@@ -239,40 +192,25 @@ for i in range(0,np.size(idx_list,1)):
     
     # start detached processing of the data to let another cpmg run without interruption
     if en_multithreads:
-        process = Thread(target=compute_phenc_ReIm_2D__mthread, args=[nmrObj, phenc_conf, i*2, x, y, kspace_asum, kspace_a0])
+        process = Thread(target=compute_phenc_ReIm_1D__mthread, args=[nmrObj, phenc_conf, i*2, i, kspace_asum, kspace_a0])
         process.start()
         threads.append(process)
     else:
-        compute_phenc_ReIm_2D__mthread(nmrObj, phenc_conf, i*2, x, y, kspace_asum, kspace_a0)
+        compute_phenc_ReIm_1D__mthread(nmrObj, phenc_conf, i*2, i, kspace_asum, kspace_a0)
                 
     tmeas.reportTimeSinceLast("############################################################################## cpmg ")
     
     # draw when one concentric square is finished
-    if (i==np.size(idx_list,1)-1): # find if it's the last scan on the list
+    if (i==np.size(ilist)-1): # find if it's the last scan on the list
         if en_multithreads:
             # collect all running processes
             for thread in threads:
                 thread.join()
         
         # plot image_asum from kspace_asum and save data
-        plot_image_and_save (fig_num_asum, nmrObj, kspace_asum, "asum_%05d" % (idx_list[0,i]))
+        plot_image_and_save (fig_num_asum, nmrObj, kspace_asum, "asum_%05d" % (i))
         
         tmeas.reportTimeSinceLast("############################################################################## plot and save data")
-
-    else:
-        sq_next = int(idx_list[0,i+1])
-        if (sq_curr < sq_next): # find if it's the last scan within one concentric square. If it is, then draw the data
-            sq_curr = sq_next # increment the square layer because this is the last scan of this layer
-            
-            if en_multithreads:
-                # collect all running processes
-                for thread in threads:
-                    thread.join()
-            
-            # plot image_asum from kspace_asum and save data
-            plot_image_and_save (fig_num_asum, nmrObj, kspace_asum, "asum_%05d" % (idx_list[0,i]))
-            
-            tmeas.reportTimeSinceLast("############################################################################## plot and save data")
  
 # DUMMY SCAN: discharge power from the lcs
 phenc_conf.en_lcs_pchg = 0

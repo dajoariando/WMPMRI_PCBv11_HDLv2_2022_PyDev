@@ -70,6 +70,7 @@ def compute_multiexp( nmrObj, phenc_conf, expt_num, sav_fig, show_fig):
     unit__uvolt_or_digit = False # set to 0 of ADC digit unit, or 1 for microvolt unit for all the plot 
     
     sav_indv_dat = True # save individual computed data
+    sav_as_pdf = False # save the data as a pdf file
     
     # font size on figures
     plt.rcParams.update({'font.size': 14})
@@ -163,7 +164,8 @@ def compute_multiexp( nmrObj, phenc_conf, expt_num, sav_fig, show_fig):
         else:
             plt.ylabel( 'adc out (digit)' )
         plt.savefig( data_folder + '\\decay_raw_%06d.png' % expt_num )
-        plt.savefig( data_folder + '\\decay_raw_%06d.pdf' % expt_num, format='pdf' )
+        if sav_as_pdf:
+            plt.savefig( data_folder + '\\decay_raw_%06d.pdf' % expt_num, format='pdf' )
 
     # raw average data
     echo_rawavg = np.zeros( SpE, dtype = float )
@@ -183,7 +185,8 @@ def compute_multiexp( nmrObj, phenc_conf, expt_num, sav_fig, show_fig):
             plt.ylabel( 'adc out (digit)' )
         # plt.legend()
         plt.savefig( data_folder + '\\echo_avg_%06d.png' % expt_num )
-        plt.savefig( data_folder + '\\echo_avg_%06d.pdf' % expt_num, format='pdf' )
+        if sav_as_pdf:
+            plt.savefig( data_folder + '\\echo_avg_%06d.pdf' % expt_num, format='pdf' )
         
     if sav_indv_dat: # write echo raw avg
         data_parser.write_text_overwrite( data_folder, "\\echo_avg.txt", "format: echo_avg, time_us" )
@@ -232,7 +235,8 @@ def compute_multiexp( nmrObj, phenc_conf, expt_num, sav_fig, show_fig):
         else:
             plt.ylabel( 'adc out (digit)' )
         plt.savefig( data_folder + '\\decay_filt_%06d.png' % expt_num )
-        plt.savefig( data_folder + '\\decay_filt_%06d.pdf' % expt_num, format='pdf' )
+        if sav_as_pdf:
+            plt.savefig( data_folder + '\\decay_filt_%06d.pdf' % expt_num, format='pdf' )
 
     # find echo average, echo magnitude
     echo_avg = np.zeros( SpE, dtype = complex )
@@ -257,7 +261,8 @@ def compute_multiexp( nmrObj, phenc_conf, expt_num, sav_fig, show_fig):
             plt.ylabel( 'adc out (digit)' )
         plt.legend()
         plt.savefig( data_folder + '\\echo_shape_%06d.png' % expt_num )
-        plt.savefig( data_folder + '\\echo_shape_%06d.pdf' % expt_num, format='pdf' )
+        if sav_as_pdf:
+            plt.savefig( data_folder + '\\echo_shape_%06d.pdf' % expt_num, format='pdf' )
         
         if sav_indv_dat:
             data_parser.write_text_overwrite( data_folder, "\\echo_shape.txt", "format: abs, real, imag, time_us" )
@@ -296,7 +301,8 @@ def compute_multiexp( nmrObj, phenc_conf, expt_num, sav_fig, show_fig):
         plt.ylabel( 'Echo amplitude (a.u.)' )
         plt.legend()
         plt.savefig( data_folder + '\\echo_spect_%06d.png' % expt_num )
-        plt.savefig( data_folder + '\\echo_spect_%06d.pdf' % expt_num, format='pdf' )
+        if sav_as_pdf:
+            plt.savefig( data_folder + '\\echo_spect_%06d.pdf' % expt_num, format='pdf' )
         
         if sav_indv_dat:
             data_parser.write_text_overwrite( data_folder, "\\echo_spect.txt", "format: real, imag, freq_MHz" )
@@ -326,9 +332,12 @@ def compute_multiexp( nmrObj, phenc_conf, expt_num, sav_fig, show_fig):
             else:
                 # find amplitude with echo average
                 a[i] = np.mean( np.multiply( data_filt[i, mtch_fltr_sta_idx:SpE], np.abs( echo_avg[mtch_fltr_sta_idx:SpE] / np.max(np.abs(echo_avg[mtch_fltr_sta_idx:SpE])) ) ) )  # (echo*normalize(echo_conjugate))
-
+    
+    # compute asum
     asum_re = np.sum( np.real( a[ignore_echoes:] ) )
+    # asum_re = np.sum( np.abs( np.real( a[ignore_echoes:] ) ) ) # does not work. Caused a weird image output
     asum_im = np.sum( np.imag( a[ignore_echoes:] ) )
+    # asum_im = np.sum( np.abs( np.imag( a[ignore_echoes:] ) ) ) # does not work. Caused a weird image output
     
     def dual_exp_func(x, a0, t2a, a1, t2b): # dual exponential
         return a0 * np.exp(-1/t2a * x) + a1 * np.exp(-1/t2b * x)
@@ -393,7 +402,8 @@ def compute_multiexp( nmrObj, phenc_conf, expt_num, sav_fig, show_fig):
         else:
             plt.ylabel( 'adc out (digit)' )
         plt.savefig( data_folder + '\\decay_sum_%06d.png' % expt_num )
-        plt.savefig( data_folder + '\\decay_sum_%06d.pdf' % expt_num, format='pdf' )
+        if sav_as_pdf:
+            plt.savefig( data_folder + '\\decay_sum_%06d.pdf' % expt_num, format='pdf' )
         
         if sav_indv_dat:
             data_parser.write_text_overwrite( data_folder, "\\decay_sum.txt", "output params: noise std: %0.5f, res std: %0.5f, snr_imag: %0.3f, snr_res: %0.3f, a0: %s, T2: %s ms. Format: a_real, a_imag, fit, time(s) " % ( noise, res, snr_imag, snr_res, np.array_str(a0,precision=2), np.array_str(T2*1e3,precision=2) ) )          
