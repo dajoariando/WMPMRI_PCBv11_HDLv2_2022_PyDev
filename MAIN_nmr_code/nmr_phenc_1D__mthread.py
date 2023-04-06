@@ -76,7 +76,6 @@ from sys_configs.phenc_conf_halbach_v03_230323 import phenc_conf_halbach_v03_230
 phenc_conf = phenc_conf_halbach_v03_230323()
 
 # modify default parameters
-phenc_conf.n_iterate = 2
 phenc_conf.gradz_len_us = 800 # gradient pulse length
 phenc_conf.gradx_len_us = 800 # gradient pulse length
 phenc_conf.enc_tao_us = 1000 # the encoding time
@@ -150,9 +149,10 @@ phenc_conf.en_lcs_dchg = 0 # disable lcs discharging because the vpc has to main
 # post-processing parameters for the phase encoding imaging
 phenc_conf.en_ext_rotation = 1 # enable external reference for echo rotation
 phenc_conf.thetaref = theta_ref # external parameter: echo rotation angle
-phenc_conf.en_conj_matchfilter = 0 # disable conjugate matchfiltering because it will auto-rotate the data
-phenc_conf.en_ext_matchfilter = 0 # enable external reference for matched filtering
-phenc_conf.echoref_avg = 0 # echo_avg_ref # external parameter: matched filtering echo average
+phenc_conf.en_conj_matchfilter = 1 # enable conjugate matchfiltering but it has to be enabled along with ext_matchfilter and external rotation
+phenc_conf.en_ext_matchfilter = 1 # enable external reference for matched filtering
+en_self_rotation = 0 # enable self rotation with the angle estimated by its own echo (is automatically disactivated when en_ext_rotation is active
+phenc_conf.echoref_avg = echo_avg_ref # external parameter: matched filtering echo average
 sav_fig = 0 # disable figure save
 show_fig = 0 # disable figure show
 

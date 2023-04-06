@@ -1,4 +1,4 @@
-class phenc_conf_halbach_v03_230323():
+class phenc_conf_halbach_v03_230323_dopedwater():
 # this configuration is for:
 # halbach8 v03 that contains 30 turns rx solenoid coil, 2 turn gradient coils for x and z, 4 turns tx coil
 
@@ -8,7 +8,7 @@ class phenc_conf_halbach_v03_230323():
     p180_p90_fact = 1.6 # multiplication factor between p90 to p180 length
     
     # cpmg settings
-    cpmg_freq = 4.17 # 4.157 # in MHz
+    cpmg_freq = 4.164 # 4.157 # in MHz
     bstrap_pchg_us = 2000
     lcs_pchg_us = 20
     lcs_dump_us = 100
@@ -24,7 +24,7 @@ class phenc_conf_halbach_v03_230323():
     p180_dtcl = p90_dtcl
     echoshift_us = 9
     echotime_us = 200 # 400 or 70
-    scanspacing_us = 100000
+    scanspacing_us = 200000 # normally 100000 for doped water
     samples_per_echo = 1000 # 1000, 600, 200, 100
     echoes_per_scan = 280 # 280 for water, 400 for oil
     n_iterate =  2
@@ -54,6 +54,8 @@ class phenc_conf_halbach_v03_230323():
     # lcs charging param
     en_lcs_pchg = 1 # enable lcs precharging
     en_lcs_dchg = 1 # enable lcs discharging
+    # add dummy scan before measurement to mitigate inconsistent signal for first scan
+    dummy_scan_num = 1 # the dummy_scan_num added dummy scans at before measurement scans in order to have consistent measurement (same T1) across all scans
     
     # post-processing parameters
     dconv_f = 0 # in MHz. when set to 0, the downconversion local oscillator is set to be B1 freq. When set the other value, the downconversion losc is just the set value.

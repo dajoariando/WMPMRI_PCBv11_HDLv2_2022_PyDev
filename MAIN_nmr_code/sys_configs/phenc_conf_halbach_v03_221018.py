@@ -54,6 +54,9 @@ class phenc_conf_halbach_v03_221018():
     # lcs charging param
     en_lcs_pchg = 1 # enable lcs precharging
     en_lcs_dchg = 1 # enable lcs discharging
+    # add dummy scan before measurement to mitigate inconsistent signal for first scan
+    dummy_scan_num = 0 # the dummy_scan_num added dummy scans at before measurement scans in order to have consistent measurement (same T1) across all scans
+
     
     # post-processing parameters
     dconv_f = 0 # in MHz. when set to 0, the downconversion local oscillator is set to be B1 freq. When set the other value, the downconversion losc is just the set value.

@@ -47,8 +47,8 @@ nmrObj = nmr_system_2022( client_data_folder )
 tmeas.reportTimeSinceLast("### load libraries")
 
 # import default measurement configuration
-from sys_configs.phenc_conf_halbach_v03_230323 import phenc_conf_halbach_v03_230323
-phenc_conf = phenc_conf_halbach_v03_230323()
+from sys_configs.phenc_conf_halbach_v03_230323_dopedwater import phenc_conf_halbach_v03_230323_dopedwater
+phenc_conf = phenc_conf_halbach_v03_230323_dopedwater()
 
 # modify the experiment parameters
 phenc_conf.gradz_volt = 0.10

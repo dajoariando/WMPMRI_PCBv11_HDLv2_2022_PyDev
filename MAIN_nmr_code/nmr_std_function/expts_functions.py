@@ -120,6 +120,7 @@ def compute_phenc_ReIm_2D__mthread ( nmrObj, phenc_conf, expt_num, x, y, kspace,
     # post-processing parameters
     sav_fig = 0 # disable figure save
     show_fig = 0 # disable figure show
+    sav_dat = 1 # save experiment data
     
     # create a new scp and ssh instance
     ssh, scp = init_ntwrk ( nmrObj.server_ip, nmrObj.ssh_usr, nmrObj.ssh_passwd )
@@ -135,9 +136,10 @@ def compute_phenc_ReIm_2D__mthread ( nmrObj, phenc_conf, expt_num, x, y, kspace,
     # post-processing
     #_, Y_asum_re, Y_asum_im, Y_a0, Y_snr, Y_T2, Y_noise, Y_res, Y_theta, _, _, _ = compute_multiple( nmrObj, phenc_conf, expt_num, sav_fig, show_fig)
     _, Y_asum_re, Y_asum_im, Y_a0, Y_snr, Y_T2, Y_noise, Y_res, Y_theta, _, _, _ = compute_multiexp( nmrObj, phenc_conf, expt_num, sav_fig, show_fig)
-    # delete the data to save space
-    os.remove(indv_datadir+"\\dsum_%06d.txt" % expt_num)
-    os.remove(indv_datadir+"\\acqu_%06d.par" % expt_num)
+    if (not sav_dat):
+        # delete the data to save space
+        os.remove(indv_datadir+"\\dsum_%06d.txt" % expt_num)
+        os.remove(indv_datadir+"\\acqu_%06d.par" % expt_num)
         
     # create folder for this measurement
     indv_datadir = nmrObj.client_data_folder + nmrObj.folder_extension
@@ -150,9 +152,10 @@ def compute_phenc_ReIm_2D__mthread ( nmrObj, phenc_conf, expt_num, x, y, kspace,
     # post-processing
     # _, X_asum_re, X_asum_im, X_a0, X_snr, X_T2, X_noise, X_res, X_theta, _, _, _ = compute_multiple( nmrObj, phenc_conf, expt_num+1, sav_fig, show_fig)
     _, X_asum_re, X_asum_im, X_a0, X_snr, X_T2, X_noise, X_res, X_theta, _, _, _ = compute_multiexp( nmrObj, phenc_conf, expt_num+1, sav_fig, show_fig)
-    # delete the data to save space
-    os.remove(indv_datadir+"\\dsum_%06d.txt" % (expt_num+1))
-    os.remove(indv_datadir+"\\acqu_%06d.par" % (expt_num+1))
+    if (not sav_dat):
+        # delete the data to save space
+        os.remove(indv_datadir+"\\dsum_%06d.txt" % (expt_num+1))
+        os.remove(indv_datadir+"\\acqu_%06d.par" % (expt_num+1))
     
     # combine the real and imaginary data
     kspace[x,y] = Y_asum_re + 1j*X_asum_im

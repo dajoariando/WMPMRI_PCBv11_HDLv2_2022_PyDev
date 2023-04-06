@@ -61,17 +61,29 @@ phenc_conf.gradz_len_us = 1
 phenc_conf.gradx_len_us = 1
 
 # set list of the the enc_tao_us
-enc_tao_us_sw = np.linspace(100, 10000, 10)
-
+enc_tao_us_sw = np.linspace(200, 10000, 99)
+# create containers for data
 asum_re = np.zeros(np.size(enc_tao_us_sw));
 asum_im = np.zeros(np.size(enc_tao_us_sw));
 a0_list = np.zeros(np.size(enc_tao_us_sw));
 T2 = np.zeros(np.size(enc_tao_us_sw));
 
-
+# run reference scan
+show_fig = 1
+phenc_conf.enc_tao_us = enc_tao_us_sw[0] # set the first tao as reference for all
+_, _, _, _, _, _, _, theta_ref, echo_avg_ref = phenc(nmrObj, phenc_conf, expt_num, sav_fig, show_fig)
+# set settings for scan. use reference scan for rotation and match filtering
+phenc_conf.en_ext_rotation = 1 # enable external reference for echo rotation
+phenc_conf.thetaref = theta_ref # external parameter: echo rotation angle
+phenc_conf.en_conj_matchfilter = 1 # enable conjugate matchfiltering but it has to be enabled along with ext_matchfilter and external rotation
+phenc_conf.en_ext_matchfilter = 1 # enable external reference for matched filtering
+en_self_rotation = 0 # enable self rotation with the angle estimated by its own echo (is automatically disactivated when en_ext_rotation is active
+phenc_conf.echoref_avg = echo_avg_ref # external parameter: matched filtering echo average
+sav_fig = 1 # save figures
+show_fig = 0  # show figures
 
 for i in range(0,np.size(enc_tao_us_sw,0)):
-
+    # set the encoding tao
     phenc_conf.enc_tao_us = enc_tao_us_sw[i]
     expt_num = i
 

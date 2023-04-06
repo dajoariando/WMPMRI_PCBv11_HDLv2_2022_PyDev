@@ -122,7 +122,7 @@ def compute_multiexp( nmrObj, phenc_conf, expt_num, sav_fig, show_fig):
         dataraw = data        
         
     else:
-        # read sum data only
+        # read sum data only (the sum data is actually averaged in C program already)
         file_path = ( data_folder + '\\dsum_%06d.txt' % expt_num )
         data = np.zeros( NoE * SpE )
         
@@ -204,7 +204,7 @@ def compute_multiexp( nmrObj, phenc_conf, expt_num, sav_fig, show_fig):
         data_filt = data_filt * np.exp( -1j * thetaref )
         theta = math.atan2( np.sum( np.imag( data_filt[ignore_echoes:,:] ) ),
                            np.sum( np.real( data_filt[ignore_echoes:,:] ) ) )
-    else:
+    else: # calculate theta. If necessary, perform self-rotation.
         theta = math.atan2( np.sum( np.imag( data_filt[ignore_echoes:,:] ) ),
                            np.sum( np.real( data_filt[ignore_echoes:,:] ) ) )
         if en_self_rotation:
@@ -312,26 +312,32 @@ def compute_multiexp( nmrObj, phenc_conf, expt_num, sav_fig, show_fig):
 
     # matched filtering
     a = np.zeros( NoE, dtype = complex )
-    for i in range( 0, NoE ):
-        if en_conj_matchfilter:
-            if en_ext_matchfilter:
+    for i in range( 0, NoE ): # do for every echo            
+        if en_ext_matchfilter: # enable external matched-filtering
+            if en_conj_matchfilter: # enable conjugate filtering
                 # find amplitude with reference echo
+                # a[i] = np.mean( data_filt[i, mtch_fltr_sta_idx:SpE] ) # simple echo average
                 # a[i] = np.sqrt(np.mean( np.multiply( data_filt[i, mtch_fltr_sta_idx:SpE], np.conj( echoref_avg[mtch_fltr_sta_idx:SpE] ) ) ) ) # sqrt(echo*echo_conjugate) --- wrong! because the echo average is a constant multiplier that does not change T2, but sqrt changes T2.
                 a[i] = np.mean( np.multiply( data_filt[i, mtch_fltr_sta_idx:SpE], np.conj( echoref_avg[mtch_fltr_sta_idx:SpE] / np.max(np.abs(echoref_avg[mtch_fltr_sta_idx:SpE]))) ) ) # echo*echo_conjugate
-                # a[i] = np.mean( data_filt[i, mtch_fltr_sta_idx:SpE] ) # echo
             else:
+                # find amplitude with reference echo
+                # a[i] = np.mean( data_filt[i, mtch_fltr_sta_idx:SpE] ) # simple echo average
+                a[i] = np.mean( np.multiply( data_filt[i, mtch_fltr_sta_idx:SpE], np.abs( echoref_avg[mtch_fltr_sta_idx:SpE] / np.max(np.abs(echoref_avg[mtch_fltr_sta_idx:SpE]))) ) )
+                
+        else: # use self-filtering
+            if en_conj_matchfilter: # enable conjugate filtering
                 # find amplitude with echo average
+                # a[i] = np.mean( data_filt[i, mtch_fltr_sta_idx:SpE] ) # simple echo average
                 # a[i] = np.sqrt(np.mean(np.multiply( data_filt[i, mtch_fltr_sta_idx:SpE], np.conj( echo_avg[mtch_fltr_sta_idx:SpE] ) ) ) )  # sqrt(echo*echo_conjugate) --- wrong! because the echo average is a constant multiplier that does not change T2, but sqrt changes T2.
                 a[i] = np.mean( np.multiply( data_filt[i, mtch_fltr_sta_idx:SpE], np.conj( echo_avg[mtch_fltr_sta_idx:SpE] / np.max(np.abs(echo_avg[mtch_fltr_sta_idx:SpE])) ) ) )  # (echo*normalize(echo_conjugate))
-                # a[i] = np.mean( data_filt[i, mtch_fltr_sta_idx:SpE] ) # echo
                 # a[i] = np.mean( np.multiply( data_filt[i, mtch_fltr_sta_idx:SpE], np.conj( echo_avg[mtch_fltr_sta_idx:SpE] / echo_avg_rms ) ) )  # (echo*normalize(echo_conjugate))
-        else:
-            if en_ext_matchfilter:
-                # find amplitude with reference echo
-                a[i] = np.mean( np.multiply( data_filt[i, mtch_fltr_sta_idx:SpE], np.abs( echoref_avg[mtch_fltr_sta_idx:SpE] / np.max(np.abs(echoref_avg[mtch_fltr_sta_idx:SpE]))) ) )
             else:
                 # find amplitude with echo average
-                a[i] = np.mean( np.multiply( data_filt[i, mtch_fltr_sta_idx:SpE], np.abs( echo_avg[mtch_fltr_sta_idx:SpE] / np.max(np.abs(echo_avg[mtch_fltr_sta_idx:SpE])) ) ) )  # (echo*normalize(echo_conjugate))
+                # a[i] = np.mean( data_filt[i, mtch_fltr_sta_idx:SpE] ) # simple echo average
+                a[i] = np.mean( np.multiply( data_filt[i, mtch_fltr_sta_idx:SpE], np.abs( echo_avg[mtch_fltr_sta_idx:SpE] / np.max(np.abs(echo_avg[mtch_fltr_sta_idx:SpE])) ) ) )  # (echo*normalize(echo_conjugate))     
+           
+                
+                
     
     # compute asum
     asum_re = np.sum( np.real( a[ignore_echoes:] ) )

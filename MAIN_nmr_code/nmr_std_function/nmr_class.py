@@ -93,7 +93,8 @@ class nmr_system_2022:
                    str( cpmg_conf.gradx_volt ) + " " +
                    str( cpmg_conf.en_lcs_pchg ) + " " +
                    str( cpmg_conf.en_lcs_dchg ) + " " +
-                   str( expt_num )
+                   str( expt_num ) + " " +
+                   str( cpmg_conf.dummy_scan_num )
                    )
     
         ssh_cmd = self.server_path +'/'+ self.exec_folder +'/'+ command
@@ -196,7 +197,8 @@ class nmr_system_2022:
                    
                    str( phenc_conf.en_lcs_pchg ) + " " +
                    str( phenc_conf.en_lcs_dchg ) + " " +
-                   str( expt_num )
+                   str( expt_num ) + " " +
+                   str( phenc_conf.dummy_scan_num )
                    
                    )
     
