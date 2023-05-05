@@ -46,13 +46,13 @@ nmrObj = nmr_system_2022( client_data_folder )
 tmeas.reportTimeSinceLast("### load libraries")
 
 # import default measurement configuration
-from sys_configs.phenc_conf_halbach_v03_230323 import phenc_conf_halbach_v03_230323
-phenc_conf = phenc_conf_halbach_v03_230323()
+from sys_configs.phenc_conf_halbach_v06_230503_dopedwater import phenc_conf_halbach_v06_230503_dopedwater
+phenc_conf = phenc_conf_halbach_v06_230503_dopedwater()
 
 # sweep frequency
 val_center = phenc_conf.vvarac
-val_range = 0.1
-val_npts = 11
+val_range = 1
+val_npts = 21
 val_sw = np.linspace(val_center-0.5*val_range,val_center+0.5*val_range,val_npts)
 
 # modify the experiment parameters
@@ -70,11 +70,11 @@ phenc_conf.en_lcs_dchg = 0 # enable lcs discharging
 expt_num = 0 # set to 0 for a single experiment
 sav_fig = 1 # save figure for reference scan
 show_fig = 1 # show figure for reference scan
-_, _, _, _, _, _, _, theta_ref, _ = phenc (nmrObj, phenc_conf, expt_num, sav_fig, show_fig)
+_, _, _, _, _, _, _, theta_ref, _, _ = phenc (nmrObj, phenc_conf, expt_num, sav_fig, show_fig)
 
 # post-processing parameters for the phase encoding imaging
 nmrObj.folder_extension = ("") # remove the folder extension and use only the data directory to process the data
-phenc_conf.en_ext_rotation = 1 # enable external reference for echo rotation
+phenc_conf.en_ext_rotation = 0 # enable external reference for echo rotation
 phenc_conf.thetaref = theta_ref # external parameter: echo rotation angle
 phenc_conf.en_conj_matchfilter = 0 # disable conjugate matchfiltering because it will auto-rotate the data
 phenc_conf.en_ext_matchfilter = 0 # enable external reference for matched filtering
@@ -86,6 +86,12 @@ show_fig = 0  # show figures
 phenc_conf.en_lcs_pchg = 0 # disable lcs precharging because the vpc is already precharged by the reference scan
 phenc_conf.en_lcs_dchg = 0 # disable lcs discharging because the vpc has to maintain its voltage for next scan
 
+# data container
+# set data containers
+asum_re = np.zeros(val_npts);
+asum_im = np.zeros(val_npts);
+theta = np.zeros(val_npts);
+
 # run the sweep
 for i,val_curr in enumerate(val_sw):
     
@@ -95,8 +101,35 @@ for i,val_curr in enumerate(val_sw):
     print("\t\t\t\texpt: %d/%d ----- vvarac = %0.3f V" % (i,len(val_sw)-1,val_curr) )
     phenc_conf.vvarac = val_curr
     expt_num = i
-    phenc(nmrObj, phenc_conf, expt_num, sav_fig, show_fig)
+    asum_re[i], asum_im[i], _, _, _, _, _, theta[i], _, _= phenc(nmrObj, phenc_conf, expt_num, sav_fig, show_fig)
+    
+    
+    # plot the figure
+    plt.ion()
+    fig = plt.figure(77, figsize=(14,8))
+    fig.clf()
+    ax1 = fig.add_subplot( 3, 1, 1 )
+    ax1.plot( val_sw[0:i],asum_re[0:i], '-o' )
+    # ax1.plot( asum_im[0:i], '-o' )
+    ax1.grid()
+    plt.ylabel("asum_re")
+    # ax1.legend(["re", "im"])
+    
+    ax2 = fig.add_subplot( 3, 1, 2 )
+    ax2.plot( val_sw[0:i],asum_im[0:i], '-o' )
+    ax2.grid()
+    plt.ylabel("asum_im")
+    
+    ax3 = fig.add_subplot( 3, 1, 3 )
+    ax3.plot( val_sw[0:i],theta[0:i]/(2*np.pi)*360, '-o' )
+    ax3.grid()
+    plt.ylabel("theta (degrees)")
 
+    
+    fig.canvas.draw()
+    fig.canvas.flush_events()
+    
+plt.savefig(nmrObj.client_data_folder+"\\monitor_plot.png")  
 tmeas.reportTimeSinceLast("### processing")
 
 # clean up

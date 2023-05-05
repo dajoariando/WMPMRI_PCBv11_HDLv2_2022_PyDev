@@ -21,16 +21,22 @@ class time_meas:
         if ( self.en ):
             self.timeSto = time()
 
-    def reportTimeRel( self, msg ):  # print relative time to the previous start
+    def reportTimeRel( self, msg ):  # print relative time to the previous start        
         if ( self.en ):
             print( "%s : %0.2f s" % ( msg, self.timeSto - self.timeSta ) )
 
-    def reportTimeAbs( self, msg ):
+    def reportTimeAbs( self, msg ): # print the absolute elapsed time since the initialization of the module
         if ( self.en ):
             print( "%s : %0.2f s" % ( msg, self.timeSto - self.timeInit ) )
+        
+    def getTimeAbs (self): # return the absolute elapsed tiem since the initialization of the module
+        return self.timeSto - self.timeInit
     
     def reportTimeSinceLast (self, msg):
         if (self.en):
             self.timeLast = self.timeSto
             self.timeSto = time()
             print( "%s : %0.2f s" % ( msg, self.timeSto - self.timeLast ) )
+            return (self.timeSto - self.timeLast)
+        else:
+            return 0 # time is not enabled

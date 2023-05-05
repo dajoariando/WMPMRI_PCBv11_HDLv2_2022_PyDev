@@ -51,8 +51,8 @@ nmrObj = nmr_system_2022( client_data_folder )
 tmeas.reportTimeSinceLast("### load libraries")
 
 # import default measurement configuration
-from sys_configs.phenc_conf_halbach_v03_230323 import phenc_conf_halbach_v03_230323
-phenc_conf = phenc_conf_halbach_v03_230323()
+from sys_configs.phenc_conf_halbach_v06_230503_dopedwater import phenc_conf_halbach_v06_230503_dopedwater
+phenc_conf = phenc_conf_halbach_v06_230503_dopedwater()
 
 # modify the experiment parameters
 phenc_conf.gradz_volt = 0.10
@@ -71,7 +71,7 @@ T2 = np.zeros(np.size(enc_tao_us_sw));
 # run reference scan
 show_fig = 1
 phenc_conf.enc_tao_us = enc_tao_us_sw[0] # set the first tao as reference for all
-_, _, _, _, _, _, _, theta_ref, echo_avg_ref = phenc(nmrObj, phenc_conf, expt_num, sav_fig, show_fig)
+_, _, _, _, _, _, _, theta_ref, echo_avg_ref, _ = phenc(nmrObj, phenc_conf, expt_num, sav_fig, show_fig)
 # set settings for scan. use reference scan for rotation and match filtering
 phenc_conf.en_ext_rotation = 1 # enable external reference for echo rotation
 phenc_conf.thetaref = theta_ref # external parameter: echo rotation angle
@@ -88,7 +88,7 @@ for i in range(0,np.size(enc_tao_us_sw,0)):
     expt_num = i
 
     # run the experiment
-    asum_re[i], asum_im[i], a0, _, T2[i], _, _, _, _ = phenc(nmrObj, phenc_conf, expt_num, sav_fig, show_fig)
+    asum_re[i], asum_im[i], a0, _, T2[i], _, _, _, _, _ = phenc(nmrObj, phenc_conf, expt_num, sav_fig, show_fig)
     a0_list[i] = a0[0];
     
     tmeas.reportTimeSinceLast("### processing")

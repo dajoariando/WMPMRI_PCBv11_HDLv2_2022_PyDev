@@ -1,20 +1,20 @@
-class phenc_conf_halbach_v03_230323_dopedwater():
+class phenc_conf_halbach_v04_230426_purewater():
 # this configuration is for:
 # halbach8 v03 that contains 30 turns rx solenoid coil, 2 turn gradient coils for x and z, 4 turns tx coil
 
     # pulse parameters
-    plen_base = 3.00 # 4.40 # the precharging length base. Don't forget to set the corresponding p90_us
-    refill_mult = 0.8 # the refill multiplication to compensate RF loss
+    plen_base = 4.00 # 4.00 # the precharging length base. Don't forget to set the corresponding p90_us
+    refill_mult = 1.6 # the refill multiplication to compensate RF loss
     p180_p90_fact = 2.0 # 2.0 # multiplication factor between p90 to p180 length
     
     # cpmg settings
-    cpmg_freq = 4.158 # 4.164 # in MHz
+    cpmg_freq = 4.198 # 4.164 # in MHz
     bstrap_pchg_us = 2000
     lcs_pchg_us = 20
     lcs_dump_us = 100
     p90_pchg_us = plen_base
     p90_pchg_refill_us = plen_base*refill_mult
-    p90_us = 12 # 8.00
+    p90_us = 10 # 10.00
     p90_dchg_us = p90_pchg_us+p90_pchg_refill_us # used to be 150
     p90_dtcl = 0.5
     p180_pchg_us = plen_base *p180_p90_fact
@@ -23,16 +23,16 @@ class phenc_conf_halbach_v03_230323_dopedwater():
     p180_dchg_us = p180_pchg_us+p180_pchg_refill_us # used to be p90_dchg_us
     p180_dtcl = p90_dtcl
     echoshift_us = 9
-    echotime_us = 200 # 400 or 70
-    scanspacing_us = 400000 # normally 100000 for doped water
+    echotime_us = 1000 # 400 or 70
+    scanspacing_us = 4000000 # normally 100000 for doped water
     samples_per_echo = 1000 # 1000, 600, 200, 100
-    echoes_per_scan = 280 # 280 for water, 400 for oil
-    n_iterate =  2
+    echoes_per_scan = 1000 # 280 for water, 400 for oil
+    n_iterate = 2
     ph_cycl_en = 1 # phase cycle enable
     dconv_fact = 1 # unused for current cpmg code
     echoskip = 1 # unused for current cpmg code
     echodrop = 0 # unused for current cpmg code
-    vvarac = -1.82 # -1.87 # set to -1.91V # more negative, more capacitance
+    vvarac = -1.28 # -1.87 # set to -1.91V # more negative, more capacitance
     # precharging the vpc
     lcs_vpc_pchg_us = 25
     lcs_recycledump_us = 1000
@@ -55,12 +55,12 @@ class phenc_conf_halbach_v03_230323_dopedwater():
     en_lcs_pchg = 1 # enable lcs precharging
     en_lcs_dchg = 1 # enable lcs discharging
     # add dummy scan before measurement to mitigate inconsistent signal for first scan
-    dummy_scan_num = 1 # the dummy_scan_num added dummy scans at before measurement scans in order to have consistent measurement (same T1) across all scans
+    dummy_scan_num = 0 # the dummy_scan_num added dummy scans at before measurement scans in order to have consistent measurement (same T1) across all scans
     
     # post-processing parameters
     dconv_f = 0 # in MHz. when set to 0, the downconversion local oscillator is set to be B1 freq. When set the other value, the downconversion losc is just the set value.
     dconv_lpf_ord = 2  # downconversion order
-    dconv_lpf_cutoff_kHz = 200  # downconversion lpf cutoff
+    dconv_lpf_cutoff_kHz = 100  # downconversion lpf cutoff
     en_ext_rotation = 0 # enable external reference for echo rotation
     thetaref = 0 # external parameter: echo rotation angle
     en_ext_matchfilter = 0 # enable external reference for matched filtering

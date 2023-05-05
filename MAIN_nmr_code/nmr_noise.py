@@ -55,8 +55,8 @@ def exit( nmrObj ):
 
 
 # import default measurement configuration and modify
-from sys_configs.phenc_conf_halbach_v03_221018 import phenc_conf_halbach_v03_221018
-phenc_conf = phenc_conf_halbach_v03_221018()
+from sys_configs.phenc_conf_halbach_v06_230503_dopedwater import phenc_conf_halbach_v06_230503_dopedwater
+phenc_conf = phenc_conf_halbach_v06_230503_dopedwater()
 
 # uncomment this line to debug the nmr noise code locally here
 tuning_freq = phenc_conf.cpmg_freq # hardware tuning frequency selector, using lookup table

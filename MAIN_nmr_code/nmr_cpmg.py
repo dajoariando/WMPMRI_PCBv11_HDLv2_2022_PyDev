@@ -47,8 +47,13 @@ nmrObj = nmr_system_2022( client_data_folder )
 tmeas.reportTimeSinceLast("### load libraries")
 
 # import default measurement configuration
-from sys_configs.phenc_conf_halbach_v03_230323_dopedwater import phenc_conf_halbach_v03_230323_dopedwater
-phenc_conf = phenc_conf_halbach_v03_230323_dopedwater()
+from sys_configs.phenc_conf_halbach_v06_230503_dopedwater import phenc_conf_halbach_v06_230503_dopedwater
+phenc_conf = phenc_conf_halbach_v06_230503_dopedwater()
+
+# modify the config
+phenc_conf.en_fit = True
+#phenc_conf.a_est = [20] # array of amplitude estimate for fitting
+#phenc_conf.t2_est = [40e-3] # array of t2 estimate for fitting
 
 # run the experiment
 cpmg(nmrObj, phenc_conf, expt_num, sav_fig, show_fig)

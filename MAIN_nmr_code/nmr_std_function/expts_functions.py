@@ -20,9 +20,10 @@ def cpmg (nmrObj, phenc_conf, expt_num, sav_fig, show_fig):
     exec_rmt_ssh_cmd_in_datadir ( nmrObj.ssh, "rm dsum_%06d.txt acqu_%06d.par" % (expt_num, expt_num), nmrObj.server_data_folder )
     # post-processing
     #_, asum_re, asum_im, a0, snr, T2, noise, res, theta, _, _, _ = compute_multiple( nmrObj, phenc_conf, expt_num, sav_fig, show_fig)
-    _, asum_re, asum_im, a0, snr, T2, noise, res, theta, _, echo_avg, _ = compute_multiexp( nmrObj, phenc_conf, expt_num, sav_fig, show_fig )
-
-    return asum_re, asum_im, a0, snr, T2, noise, res, theta, echo_avg
+    _, asum_re, asum_im, a0, snr, T2, noise, res, theta, _, echo_avg, _, fpeak, spect, wvect = compute_multiexp( nmrObj, phenc_conf, expt_num, sav_fig, show_fig )
+    
+    
+    return asum_re, asum_im, a0, snr, T2, noise, res, theta, echo_avg, fpeak, spect, wvect
 
 # basic cpmg experiments with current mode
 def cpmg_cmode (nmrObj, phenc_conf, expt_num, sav_fig, show_fig):
@@ -62,9 +63,9 @@ def phenc (nmrObj, phenc_conf, expt_num, sav_fig, show_fig):
     exec_rmt_ssh_cmd_in_datadir ( nmrObj.ssh, "rm dsum_%06d.txt acqu_%06d.par" % (expt_num, expt_num), nmrObj.server_data_folder )
     # post-processing
     #_, asum_re, asum_im, a0, snr, T2, noise, res, theta, _, _, _ = compute_multiple( nmrObj, phenc_conf, expt_num, sav_fig, show_fig)
-    _, asum_re, asum_im, a0, snr, T2, noise, res, theta, _, echo_avg, _ = compute_multiexp( nmrObj, phenc_conf, expt_num, sav_fig, show_fig )
+    _, asum_re, asum_im, a0, snr, T2, noise, res, theta, _, echo_avg, _, fpeak, spect, _ = compute_multiexp( nmrObj, phenc_conf, expt_num, sav_fig, show_fig )
 
-    return asum_re, asum_im, a0, snr, T2, noise, res, theta, echo_avg
+    return asum_re, asum_im, a0, snr, T2, noise, res, theta, echo_avg, fpeak, spect
 
 
 # phase encoding experiment with both x-y p180 to get real (CPMG) and imaginary (CP) data to construct an image. With multithreading
@@ -120,7 +121,7 @@ def compute_phenc_ReIm_2D__mthread ( nmrObj, phenc_conf, expt_num, x, y, kspace,
     # post-processing parameters
     sav_fig = 0 # disable figure save
     show_fig = 0 # disable figure show
-    sav_dat = 1 # save experiment data
+    sav_dat = 0 # save experiment data
     
     # create a new scp and ssh instance
     ssh, scp = init_ntwrk ( nmrObj.server_ip, nmrObj.ssh_usr, nmrObj.ssh_passwd )
@@ -135,7 +136,7 @@ def compute_phenc_ReIm_2D__mthread ( nmrObj, phenc_conf, expt_num, x, y, kspace,
     exec_rmt_ssh_cmd_in_datadir ( ssh, "rm dsum_%06d.txt acqu_%06d.par" % (expt_num, expt_num), nmrObj.server_data_folder )
     # post-processing
     #_, Y_asum_re, Y_asum_im, Y_a0, Y_snr, Y_T2, Y_noise, Y_res, Y_theta, _, _, _ = compute_multiple( nmrObj, phenc_conf, expt_num, sav_fig, show_fig)
-    _, Y_asum_re, Y_asum_im, Y_a0, Y_snr, Y_T2, Y_noise, Y_res, Y_theta, _, _, _ = compute_multiexp( nmrObj, phenc_conf, expt_num, sav_fig, show_fig)
+    _, Y_asum_re, Y_asum_im, Y_a0, Y_snr, Y_T2, Y_noise, Y_res, Y_theta, _, _, _, _, _, _ = compute_multiexp( nmrObj, phenc_conf, expt_num, sav_fig, show_fig)
     if (not sav_dat):
         # delete the data to save space
         os.remove(indv_datadir+"\\dsum_%06d.txt" % expt_num)
@@ -151,7 +152,7 @@ def compute_phenc_ReIm_2D__mthread ( nmrObj, phenc_conf, expt_num, x, y, kspace,
     exec_rmt_ssh_cmd_in_datadir ( ssh, "rm dsum_%06d.txt acqu_%06d.par" % (expt_num+1, expt_num+1), nmrObj.server_data_folder )
     # post-processing
     # _, X_asum_re, X_asum_im, X_a0, X_snr, X_T2, X_noise, X_res, X_theta, _, _, _ = compute_multiple( nmrObj, phenc_conf, expt_num+1, sav_fig, show_fig)
-    _, X_asum_re, X_asum_im, X_a0, X_snr, X_T2, X_noise, X_res, X_theta, _, _, _ = compute_multiexp( nmrObj, phenc_conf, expt_num+1, sav_fig, show_fig)
+    _, X_asum_re, X_asum_im, X_a0, X_snr, X_T2, X_noise, X_res, X_theta, _, _, _, _, _, _ = compute_multiexp( nmrObj, phenc_conf, expt_num+1, sav_fig, show_fig)
     if (not sav_dat):
         # delete the data to save space
         os.remove(indv_datadir+"\\dsum_%06d.txt" % (expt_num+1))

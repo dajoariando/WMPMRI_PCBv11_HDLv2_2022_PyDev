@@ -72,8 +72,8 @@ en_multithreads = True # enable multithread processing of the data. Otherwise, i
 tmeas = time_meas(report_time)
 
 # import default measurement configuration and modify
-from sys_configs.phenc_conf_halbach_v03_230323 import phenc_conf_halbach_v03_230323
-phenc_conf = phenc_conf_halbach_v03_230323()
+from sys_configs.phenc_conf_halbach_v05_230427_dopedwater import phenc_conf_halbach_v05_230427_dopedwater
+phenc_conf = phenc_conf_halbach_v05_230427_dopedwater()
 
 # modify default parameters
 phenc_conf.gradz_len_us = 800 # gradient pulse length
@@ -108,7 +108,7 @@ phenc_conf.en_lcs_dchg = 0 # enable lcs discharging
 expt_num = 0 # set to 0 for a single experiment
 sav_fig = 1 # save figure for reference scan
 show_fig = 1 # show figure for reference scan
-_, _, _, _, _, _, _, theta_ref, echo_avg = phenc (nmrObj, phenc_conf, expt_num, sav_fig, show_fig)
+_, _, _, _, _, _, _, theta_ref, echo_avg, _ = phenc (nmrObj, phenc_conf, expt_num, sav_fig, show_fig)
 
 tmeas.reportTimeSinceLast("############################################################################### load libraries and reference scan")
 

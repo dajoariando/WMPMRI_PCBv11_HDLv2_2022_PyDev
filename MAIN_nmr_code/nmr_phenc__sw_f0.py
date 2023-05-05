@@ -48,12 +48,12 @@ nmrObj = nmr_system_2022( client_data_folder )
 tmeas.reportTimeSinceLast("### load libraries")
 
 # import default measurement configuration
-from sys_configs.phenc_conf_halbach_v03_230323 import phenc_conf_halbach_v03_230323
-phenc_conf = phenc_conf_halbach_v03_230323()
+from sys_configs.phenc_conf_halbach_v05_230427_dopedwater import phenc_conf_halbach_v05_230427_dopedwater
+phenc_conf = phenc_conf_halbach_v05_230427_dopedwater()
 
 # sweep frequency
 val_center = phenc_conf.cpmg_freq
-val_span = 0.01 # the span of the value, half of this value is negative to center, and half is positive to the center
+val_span = 0.1 # the span of the value, half of this value is negative to center, and half is positive to the center
 val_npts = 11
 val_sw = np.linspace(val_center-0.5*val_span,val_center+0.5*val_span,val_npts)
 
@@ -69,11 +69,11 @@ phenc_conf.enc_tao_us = 200
 print("\n(Reference scan)" )
 nmrObj.folder_extension = "\\ref"
 phenc_conf.en_lcs_pchg = 1 # enable lcs precharging
-phenc_conf.en_lcs_dchg = 0 # enable lcs discharging
+phenc_conf.en_lcs_dchg = 1 # enable lcs discharging
 expt_num = 0 # set to 0 for a single experiment
 sav_fig = 1 # save figure for reference scan
 show_fig = 1 # show figure for reference scan
-_, _, _, _, _, _, _, theta_ref, _ = phenc (nmrObj, phenc_conf, expt_num, sav_fig, show_fig)
+_, _, _, _, _, _, _, theta_ref, _, _ = phenc (nmrObj, phenc_conf, expt_num, sav_fig, show_fig)
 
 # post-processing parameters for the phase encoding imaging
 nmrObj.folder_extension = ("") # remove the folder extension and use only the data directory to process the data
@@ -86,8 +86,8 @@ sav_fig = 1 # save figures
 show_fig = 0  # show figures
 
 # settings for measurements
-phenc_conf.en_lcs_pchg = 0 # disable lcs precharging because the vpc is already precharged by the reference scan
-phenc_conf.en_lcs_dchg = 0 # disable lcs discharging because the vpc has to maintain its voltage for next scan
+phenc_conf.en_lcs_pchg = 1 # disable lcs precharging because the vpc is already precharged by the reference scan
+phenc_conf.en_lcs_dchg = 1 # disable lcs discharging because the vpc has to maintain its voltage for next scan
 
 # run the experiment sweep
 for i,val_curr in enumerate(val_sw):

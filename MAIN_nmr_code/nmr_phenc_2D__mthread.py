@@ -37,6 +37,10 @@ nmrObj = nmr_system_2022( client_data_folder )
 
 def plot_image_and_save (fig_num, nmrObj, kspace, filename):
     
+    # invert axis
+    inv_x_axis = False
+    inv_y_axis = True
+    
     # kspace increase resolution
     res_xpand = 128
     kspace_xpand = np.zeros([res_xpand, res_xpand], dtype=complex)
@@ -55,6 +59,10 @@ def plot_image_and_save (fig_num, nmrObj, kspace, filename):
     plt.imshow(np.abs(kspace),cmap='gray')
     plt.subplot(1,2,2)
     plt.imshow(np.abs(image_asum),cmap='gray')
+    if inv_x_axis:
+        plt.gca().invert_xaxis()
+    if inv_y_axis:
+        plt.gca().invert_yaxis()
     fig.canvas.draw()
     fig.canvas.flush_events()
     
@@ -72,29 +80,42 @@ en_multithreads = True # enable multithread processing of the data. Otherwise, i
 tmeas = time_meas(report_time)
 
 # import default measurement configuration and modify
-from sys_configs.phenc_conf_halbach_v03_230405_biosample import phenc_conf_halbach_v03_230405_biosample
-phenc_conf = phenc_conf_halbach_v03_230405_biosample()
+from sys_configs.phenc_conf_halbach_v06_230503_dopedwater import phenc_conf_halbach_v06_230503_dopedwater
+phenc_conf = phenc_conf_halbach_v06_230503_dopedwater()
 
 # modify default parameters
-phenc_conf.gradz_len_us = 800 # gradient pulse length
-phenc_conf.gradx_len_us = 800 # gradient pulse length
-phenc_conf.enc_tao_us = 1000 # the encoding time
+phenc_conf.gradz_len_us = 600 # gradient pulse length
+phenc_conf.gradx_len_us = 600 # gradient pulse length
+phenc_conf.enc_tao_us = 700 # the encoding time
         
 # set the maximum current and number of pixels
-npxl = 40 # 64 # number of pixels inside the image_asum
-imax = 3.0/64*npxl # maximum current with 3A corresponds to 64 pixels (both polarity will be used)
-ilist = np.linspace(-imax, imax, npxl) # create list of current being used
-write_text_overwrite( nmrObj.client_data_folder, 'grad_strength.txt', str(ilist))
+npxl = 64 # 64 # number of pixels inside the image_asum
+img_size = 1.0 # resize the image (image size of 1.0 is the standard and is used all the time in old experiment). Set to 1.1 for apparatus v05.
+i_z_expand = 1.0 # 0.94 # multiply the z gradient current with this factor
+i_x_expand = 1.0 # multiply the x gradient current with this factor
+imax = 3.0/64*npxl/img_size # maximum current with 3A corresponds to 64 pixels (both polarity will be used)
+ilist_x = np.linspace(-imax, imax, npxl)*i_x_expand # create list of current being used
+ilist_z = np.linspace(-imax, imax, npxl)*i_z_expand # create list of current being used
+write_text_overwrite( nmrObj.client_data_folder, 'grad_strength_x.txt', str(ilist_x))
+write_text_overwrite( nmrObj.client_data_folder, 'grad_strength_z.txt', str(ilist_z))
 
 # modify current list to account for 100mA DC biasing in the gradient circuit
 # the current is 0 when it's set to +/- 0.1V, instead of 0V.
-for idx,v in enumerate(ilist):
+for idx,v in enumerate(ilist_x):
     if v > 0.0001 : # use 0.01 instead of 0.0 to avoid deal with floating point number around 0.0
-        ilist[idx] = v+0.1
+        ilist_x[idx] = v+0.1
     elif v<(-0.0001) :
-        ilist[idx] = v-0.1
+        ilist_x[idx] = v-0.1
     else :
-        ilist[idx] = 0.1 # 0.1V means 0.1A to the transistor but 0.0A to the coil, because the other transistor is biased at 0.1A when it's turned off.
+        ilist_x[idx] = 0.1 # 0.1V means 0.1A to the transistor but 0.0A to the coil, because the other transistor is biased at 0.1A when it's turned off.
+
+for idx,v in enumerate(ilist_z):
+    if v > 0.0001 : # use 0.01 instead of 0.0 to avoid deal with floating point number around 0.0
+        ilist_z[idx] = v+0.1
+    elif v<(-0.0001) :
+        ilist_z[idx] = v-0.1
+    else :
+        ilist_z[idx] = 0.1 # 0.1V means 0.1A to the transistor but 0.0A to the coil, because the other transistor is biased at 0.1A when it's turned off.
 
 # perform reference scan
 print("\n(Reference scan)" )
@@ -104,7 +125,8 @@ phenc_conf.en_lcs_dchg = 0 # enable lcs discharging
 expt_num = 0 # set to 0 for a single experiment
 sav_fig = 1 # save figure for reference scan
 show_fig = 1 # show figure for reference scan
-_, _, _, _, _, _, _, theta_ref, echo_avg_ref = phenc (nmrObj, phenc_conf, expt_num, sav_fig, show_fig)
+phenc_conf.en_fit = True # enable the fitting for the reference
+_, _, _, _, _, _, _, theta_ref, echo_avg_ref, _, spect_ref = phenc (nmrObj, phenc_conf, expt_num, sav_fig, show_fig)
 
 tmeas.reportTimeSinceLast("############################################################################### load libraries and reference scan")
 
@@ -205,12 +227,15 @@ en_self_rotation = 0 # enable self rotation with the angle estimated by its own 
 phenc_conf.echoref_avg = echo_avg_ref # external parameter: matched filtering echo average
 sav_fig = 0 # disable figure save
 show_fig = 0 # disable figure show
+phenc_conf.en_fit = False # disable the fitting for the scan to save some time
+phenc_conf.en_spect_ref = 0 # enable the spect reference. Default is 0
+phenc_conf.spect_ref = spect_ref # set the spectrum reference
 
 # run dummy scan to remove first acquisition T1 difference with the others
 print("\n(Dummy scan)" )
 nmrObj.folder_extension = ("\\dummy")
 expt_num = 0 # set to 0 for dummy scan
-_, _, _, _, _, _, _, _, _ = phenc (nmrObj, phenc_conf, expt_num, sav_fig, show_fig)
+_, _, _, _, _, _, _, _, _ , _, _ = phenc (nmrObj, phenc_conf, expt_num, sav_fig, show_fig)
 
 tmeas.reportTimeSinceLast("############################################################################## pre-cpmg")
 
@@ -227,8 +252,8 @@ for i in range(0,np.size(idx_list,1)):
     y = int(idx_list[2,i])
     
     # set gradient strength
-    phenc_conf.gradz_volt = ilist[x];
-    phenc_conf.gradx_volt = ilist[y];
+    phenc_conf.gradz_volt = ilist_z[x];
+    phenc_conf.gradx_volt = ilist_x[y];
         
     # run experiment to get real part
     phenc_conf.p180_xy_angle = 2 # set 1 for x-pulse and 2 for y-pulse for p180
@@ -279,6 +304,12 @@ phenc_conf.en_lcs_pchg = 0
 phenc_conf.en_lcs_dchg = 1
 phenc_conf.p180_xy_angle = 1 # set for X p180 pulse
 nmrObj.phenc_t2_iter( phenc_conf, 0 )
+
+# calculate for the total scan time
+tmeas.reportTimeAbs("############################################################################## total scan time")
+ttot = tmeas.getTimeAbs()
+write_text_overwrite( nmrObj.client_data_folder, 'total_time.txt', "%0.5f" % ttot)
+
 
 pass
 
