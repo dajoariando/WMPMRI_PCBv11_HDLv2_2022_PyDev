@@ -6,11 +6,11 @@ show_fig = True
 expt_num = 0 # experiment number is always 0 for a single experiment
 
 # import default measurement configuration
-from sys_configs.phenc_conf_halbach_v03_221018 import phenc_conf_halbach_v03_221018
-phenc_conf = phenc_conf_halbach_v03_221018()
+from sys_configs.phenc_conf_random import phenc_conf_random
+phenc_conf = phenc_conf_random()
 
 # set local folder
-client_data_folder = "D:/Dropbox (UFL)/school/dissertation/Experimental/NMR Data/A04 HALBACH V03 2-TURNS GRADIENT 4-TURNS TX/01 BASIC/DISSERTATION_T2_221028_170354__AFTER_ADDED_GRAD_FERRITE"
+client_data_folder = "D:/NMR_DATA/cpmg_240806_212212"
 nmrObj = nmr_system_2022( client_data_folder )
 
 

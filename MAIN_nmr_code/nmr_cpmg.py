@@ -47,8 +47,8 @@ nmrObj = nmr_system_2022( client_data_folder )
 tmeas.reportTimeSinceLast("### load libraries")
 
 # import default measurement configuration
-from sys_configs.phenc_conf_halbach_v06_230503_dopedwater import phenc_conf_halbach_v06_230503_dopedwater
-phenc_conf = phenc_conf_halbach_v06_230503_dopedwater()
+from sys_configs.phenc_conf_random import phenc_conf_random
+phenc_conf = phenc_conf_random()
 
 # modify the config
 phenc_conf.en_fit = True

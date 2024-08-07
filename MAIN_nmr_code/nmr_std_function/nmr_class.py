@@ -30,11 +30,11 @@ class nmr_system_2022:
         self.dconv_gain = 0.707106781  # downconversion gain factor due to sine(45,135,225,315) multiplication
 
         # ip addresses settings for the system
-        self.server_ip = '192.168.137.2'  # '129.22.143.88'
-        self.client_ip = '192.168.137.1'  # '129.22.143.39'
-        self.server_path = '/root/NMR_PCBv11_HDLv2_2022_PyDev/MAIN_nmr_code'
+        self.server_ip = '192.168.14.204'  # '129.22.143.88'
+        self.client_ip = '192.168.14.105'  # '129.22.143.39'
+        self.server_path = '/root'
         # client path with samba
-        self.client_path = 'W:\\NMR_PCBv11_HDLv2_2022_PyDev\\MAIN_nmr_code'
+        self.client_path = 'W:\\'
         self.ssh_usr = 'root'
         self.ssh_passwd = 'dave'
         # data folder
@@ -212,7 +212,7 @@ class nmr_system_2022:
         command = ( exec_name + " " +
                    str( f_adc ) + " " +
                    str( samples ) + " " +
-                   str (vvarac)
+                   str ( vvarac )
                    )
     
         ssh_cmd = self.server_path +'/'+ self.exec_folder +'/'+ command
