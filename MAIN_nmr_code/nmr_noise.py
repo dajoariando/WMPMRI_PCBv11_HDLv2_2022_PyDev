@@ -62,8 +62,8 @@ from sys_configs.phenc_conf_halbach_v06_230503_dopedwater import phenc_conf_halb
 phenc_conf = phenc_conf_halbach_v06_230503_dopedwater()
 
 # uncomment this line to debug the nmr noise code locally here
-samp_freq = 10  # sampling frequency
-samples = 1000  # number of points
+samp_freq = 20  # sampling frequency
+samples = 100  # number of points
 vvarac = phenc_conf.vvarac # voltage for the preamp (more negative, more capacitance)
 min_freq = 0.001  # in MHz
 max_freq = 8.0  # in MHz

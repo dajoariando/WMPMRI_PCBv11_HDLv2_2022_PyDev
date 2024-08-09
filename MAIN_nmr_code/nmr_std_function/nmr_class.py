@@ -212,7 +212,8 @@ class nmr_system_2022:
         command = ( exec_name + " " +
                    str( f_adc ) + " " +
                    str( samples ) + " " +
-                   str ( vvarac )
+                   str ( vvarac ) + " " +
+                   "0 0 0" # data input mode
                    )
     
         ssh_cmd = self.server_path +'/'+ self.exec_folder +'/'+ command

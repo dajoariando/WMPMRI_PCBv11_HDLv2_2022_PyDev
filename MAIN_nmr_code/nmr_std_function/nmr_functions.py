@@ -633,12 +633,13 @@ def plot_noise_multch( minfreq, maxfreq, data_parent_folder, plotname, en_fig ):
     nmean = 0
     file_path = ( data_folder + 'noise.txt' )
     one_scan_raw = np.array( data_parser.read_data( file_path ) )
-    one_scan_raw = np.resize(one_scan_raw,(nrPnts,nrChannels))    
+    one_scan_raw = np.resize(one_scan_raw,(nrPnts,nrChannels))
+    one_scan_raw = np.transpose(one_scan_raw)  
 
     # compute in-bandwidth noise
     Sf = adcFreq * 1e6
     T = 1 / Sf
-    t = np.linspace( 0, T * ( len( one_scan_raw[:,0] ) - 1 ), len( one_scan_raw[:,0] ) )
+    t = np.linspace( 0, T * ( len( one_scan_raw[0] ) - 1 ), len( one_scan_raw[0] ) )
 
 
     if en_fig:
@@ -650,7 +651,7 @@ def plot_noise_multch( minfreq, maxfreq, data_parent_folder, plotname, en_fig ):
         mng = plt.get_current_fig_manager()
         if plot_backend == 'TkAgg' or plot_backend == 'tkagg':
             # mng.resize(*mng.window.maxsize())
-            mng.resize( 1400, 800 )
+            mng.resize( 1800, 800 )
         elif plot_backend == 'wxAgg':
             mng.frame.Maximize( True )
         elif plot_backend == 'Qt4Agg':
@@ -658,23 +659,58 @@ def plot_noise_multch( minfreq, maxfreq, data_parent_folder, plotname, en_fig ):
 
         fig.clf()
         
+        nplot = 3 # the number of plots, i.e., time-domain, freq-domain, histogram
         for j in range(0,nrChannels):
             # plot time domain data
-            ax = fig.add_subplot( nrChannels,1,j+1 )
-            x_time = np.linspace( 1, len( one_scan_raw[:,j] ), len(one_scan_raw[:,j]) )
+            ax = fig.add_subplot( nrChannels,nplot,1+j*nplot )
+            x_time = np.linspace( 1, len( one_scan_raw[j] ), len(one_scan_raw[j]) )
             x_time = np.multiply( x_time, ( 1 / adcFreq ) )  # in us
             x_time = np.multiply( x_time, 1e-3 )  # in ms
             if plot_time_or_samplenum:
-                line1, = ax.plot( x_time, one_scan_raw[:,j], 'b-' , linewidth = 0.5 )
+                line1, = ax.plot( x_time, one_scan_raw[j], 'b-' , linewidth = 0.5 )
             else:
-                line1, = ax.plot( one_scan_raw[:,j], 'b-' , linewidth = 0.5 )
-            #ax.set_xlabel( 'Time(ms)' )
-            #ax.set_ylabel( 'Amplitude (a.u.)' )
-            # ax.set_title( "Amplitude. std=%0.2f. mean=%0.2f." % ( nstd, nmean ) )
-            ax.grid()
-            if (not j==7):
+                line1, = ax.plot( one_scan_raw[j], 'b-' , linewidth = 0.5 )
+            
+            if j == nrChannels-1:
+                ax.set_xlabel( 'Time(ms)' )
+                ax.set_ylabel( 'Amplitude (a.u.)' )
+                # ax.set_title( "Amplitude. std=%0.2f. mean=%0.2f." % ( nstd, nmean ) )
+            else:
                 ax.axes.get_xaxis().set_visible(False)
-
+            # ax.grid()
+            
+            # compute fft
+            spectx, specty = nmr_fft( one_scan_raw[j], adcFreq, 0 )
+            fft_range = [i for i, value in enumerate( spectx ) if ( 
+                value >= minfreq and value <= maxfreq )]  # limit fft display
+            
+            ax = fig.add_subplot( nrChannels,nplot,2+j*nplot )
+            line1, = ax.plot( spectx[fft_range], specty[fft_range], 'b-', label = 'data', linewidth = 0.5 )
+            # plt.ylim( [0, 50] )
+            
+            if j == nrChannels-1:
+                ax.set_xlabel( 'Frequency (MHz)' )
+                ax.set_ylabel( 'Amplitude (a.u.)' )
+                # ax.set_title( "Amplitude. std=%0.2f. mean=%0.2f." % ( nstd, nmean ) )
+            else:
+                ax.axes.get_xaxis().set_visible(False)
+            # ax.grid()
+            
+            
+            # plot histogram
+            n_bins = 200
+            ax = fig.add_subplot( nrChannels,nplot,3+j*nplot )
+            n, bins, patches = ax.hist( one_scan_raw[j], bins = n_bins )
+            ax.set_xlabel( 'Histogram' )
+            ax.set_ylabel( 'Amplitude (a.u.)' )
+            #if j == nrChannels-1:
+            #    ax.set_xlabel( 'Histogram' )
+            #    ax.set_ylabel( 'Amplitude (a.u.)' )
+                # ax.set_title( "Histogram" )
+            #else:
+            #    ax.axes.get_xaxis().set_visible(False)
+            # ax.grid()
+            
 
         # plt.subplot_tool()
         plt.subplots_adjust(hspace=0)

@@ -120,6 +120,7 @@ def nmr_fft( data, fs, en_fig ):
     spectx = np.linspace( -fs / 2, fs / 2, len( data ) )
     specty = np.fft.fftshift( np.fft.fft( data - np.mean( data ) ) )
     specty = np.divide( specty, len( data ) )  # normalize fft
+    specty = np.abs(specty)
     if en_fig:
         plt.figure
         plt.plot( spectx, specty, 'b' )
