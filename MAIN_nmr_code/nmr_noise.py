@@ -40,33 +40,33 @@ def analyze( nmrObj, vvarac, samp_freq, samples, min_freq, max_freq, continuous,
         plot_noise_multch ( min_freq, max_freq, nmrObj.client_data_folder, 'noise_plot.png', en_fig )
         
         print("vvarac : ", vvarac, "\n")
-        
+                
         '''
         if (vvarac < 0.5):
-                vvarac = vvarac + 0.1;
+                vvarac = vvarac + 0.5;
         else:
             vvarac = -4.9;
-        '''
+        
         
         if ( not continuous ):
             
             break
-
+        '''
 
 def exit( nmrObj ):
     nmrObj.exit()
 
 
 # import default measurement configuration and modify
-from sys_configs.phenc_conf_halbach_v06_230503_dopedwater import phenc_conf_halbach_v06_230503_dopedwater
-phenc_conf = phenc_conf_halbach_v06_230503_dopedwater()
+from sys_configs.phenc_conf_halbach_v03_240810_oil import phenc_conf_halbach_v03_240810_oil
+phenc_conf = phenc_conf_halbach_v03_240810_oil()
 
 # uncomment this line to debug the nmr noise code locally here
-samp_freq = 20  # sampling frequency
-samples = 100  # number of points
+samp_freq = 40  # sampling frequency
+samples = 40000  # number of points
 vvarac = phenc_conf.vvarac # voltage for the preamp (more negative, more capacitance)
-min_freq = 0.001  # in MHz
-max_freq = 8.0  # in MHz
+min_freq = 2  # in MHz
+max_freq = 8  # in MHz
 continuous = True  # continuous running at one frequency configuration
 client_data_folder = "C:\\Users\\dave\\Documents\\NMR_DATA"
 en_fig = True

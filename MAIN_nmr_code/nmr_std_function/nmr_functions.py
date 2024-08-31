@@ -62,7 +62,10 @@ def compute_multiexp( nmrObj, phenc_conf, expt_num, sav_fig, show_fig):
     ignore_echoes = phenc_conf.ignore_echoes
     a_est = phenc_conf.a_est
     t2_est = phenc_conf.t2_est
+    a_bnd = phenc_conf.a_bnd
+    t2_bnd = phenc_conf.t2_bnd
     dconv_f = phenc_conf.dconv_f
+    sel_adc_ch = phenc_conf.sel_adc_ch
     
     # spectrum reference
     en_spect_ref = phenc_conf.en_spect_ref
@@ -76,7 +79,6 @@ def compute_multiexp( nmrObj, phenc_conf, expt_num, sav_fig, show_fig):
     binary_OR_ascii = True # put 1 if the data file uses binary representation, otherwise it is in ascii format
     float_OR_int32 = True # put 1 if the data file uses float representation, otherwise it is in int32 format
     unit__uvolt_or_digit = False # set to 0 of ADC digit unit, or 1 for microvolt unit for all the plot
-    sel_adc_ch = 0 # select the adc channel # for NMR to be processed
     
     sav_indv_dat = False # save individual computed data
     sav_as_pdf = False # save the data as a pdf file
@@ -217,7 +219,7 @@ def compute_multiexp( nmrObj, phenc_conf, expt_num, sav_fig, show_fig):
         data_parser.write_text_append_row( data_folder, "\\echo_avg.txt", tacq )
 
 
-    # filter the data
+    # filter the data (down conversion)
     data_filt = np.zeros( ( NoE, SpE ), dtype = complex )
     for i in range( 0, NoE ):
         data_filt[i, :] = down_conv( data[i * SpE:( i + 1 ) * SpE], i, tE, Df, Sf, dconv_lpf_ord, dconv_lpf_cutoff_kHz * 1e3 )
@@ -333,6 +335,7 @@ def compute_multiexp( nmrObj, phenc_conf, expt_num, sav_fig, show_fig):
         plt.plot( wvect / ( 2 * np.pi ), np.imag( spect ), '-', linewidth = 3, label = 'imag' )
         # plt.plot( wvect / ( 2 * np.pi ), np.abs( spect ), label = 'abs' )
         plt.xlim( spect_xlim_fact / max( tacq ) * -1, spect_xlim_fact / max( tacq ) * 1 )
+        # plt.xlim (-0.1, 0.1) # in MHz
         plt.title( "Echo spectrum. " + "Peak:real@{:0.2f}kHz,abs@{:0.2f}kHz".format( wvect[np.abs( np.real( spect ) ) == max( np.abs( np.real( spect ) ) )][0] / ( 2 * np.pi ) * 1e3, wvect[np.abs( spect ) == max( np.abs( spect ) )][0] / ( 2 * np.pi ) * 1e3 ) )
         # plt.title( "Echo spectrum. " + "Peak: {:0.2f} kHz".format( fpeak ))
         plt.xlabel( 'offset frequency (MHz)' )
@@ -391,10 +394,10 @@ def compute_multiexp( nmrObj, phenc_conf, expt_num, sav_fig, show_fig):
         asum_re = np.sum(np.real(spect)) 
         asum_im = np.sum(np.imag(spect))
     
-    def dual_exp_func(x, a0, t2a, a1, t2b): # dual exponential
-        return a0 * np.exp(-1/t2a * x) + a1 * np.exp(-1/t2b * x)
-    def single_exp_func( x, a0, t2 ): # single exponential
-        return a0 * np.exp( -1/t2 * x )
+    # def dual_exp_func(x, a0, t2a, a1, t2b): # dual exponential
+    #    return a0 * np.exp(-1/t2a * x) + a1 * np.exp(-1/t2b * x)
+    # def single_exp_func( x, a0, t2 ): # single exponential
+    #    return a0 * np.exp( -1/t2 * x )
     def multiexp_func (x, *a_t2_list): # multi-exponential fitting
         f = 0
         n = len(a_t2_list)
@@ -412,10 +415,15 @@ def compute_multiexp( nmrObj, phenc_conf, expt_num, sav_fig, show_fig):
     snr_res = 0
     snr_imag = 0
     
+    # set the upper and lower bounds    
+    bnd_rep = len(a_est)
+    lb = bnd_rep * [a_bnd[0]] + bnd_rep * [t2_bnd[0]]
+    ub = bnd_rep * [a_bnd[1]] + bnd_rep * [t2_bnd[1]]
+    
     if en_fit:
         try:  # try fitting data
     
-            popt, pocv = curve_fit (multiexp_func, t_echospace[ignore_echoes:], np.real(a[ignore_echoes:]), [a_est, t2_est])
+            popt, pocv = curve_fit (multiexp_func, t_echospace[ignore_echoes:], np.real(a[ignore_echoes:]), a_est + t2_est, bounds = (lb,ub))
             a0 = popt[:len(a_est)]
             T2 = popt[len(a_est):]
             
@@ -445,7 +453,7 @@ def compute_multiexp( nmrObj, phenc_conf, expt_num, sav_fig, show_fig):
 
         # plt.set(gca, 'FontSize', 12)
         plt.legend()
-        plt.title( 'Matched filtered data. SNRim:{:03.2f} SNRres:{:03.2f}.\na:{:s} n_im:{:0.2f} n_res:{:0.2f} T2:{:s}msec'.format( snr, snr_res, np.array_str(a0,precision=2), ( noise * math.sqrt( total_scan ) ), ( res * math.sqrt( total_scan ) ), np.array_str(T2*1e3,precision=2) ) )
+        plt.title( 'Matched filtered data. SNRim:{:03.2f} SNRres:{:03.2f}.\na:{:s} n_im:{:0.2f} n_res:{:0.2f} T2:{:s}msec'.format( snr, snr_res, np.array_str(a0,precision=2), ( noise * math.sqrt( total_scan ) ), ( res * math.sqrt( total_scan ) ), np.array_str(T2*1e3,precision=1) ) )
         # plt.title( 'Matched filtered data. SNR:{:03.2f}.\na:{:s} n:{:0.2f} T2:{:s}msec'.format( snr_res, np.array_str(a0,precision=2), ( res * math.sqrt( total_scan ) ), np.array_str(T2*1e3,precision=2) ) )
 
         

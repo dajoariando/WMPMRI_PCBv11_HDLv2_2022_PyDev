@@ -10,7 +10,7 @@ Created on May 24, 2022
 import os
 import time
 from datetime import datetime
-import pydevd
+# import pydevd
 from scipy import signal
 import matplotlib.pyplot as plt
 
@@ -47,8 +47,8 @@ nmrObj = nmr_system_2022( client_data_folder )
 tmeas.reportTimeSinceLast("### load libraries")
 
 # import default measurement configuration
-from sys_configs.phenc_conf_random import phenc_conf_random
-phenc_conf = phenc_conf_random()
+from sys_configs.phenc_conf_halbach_v03_240810_oil import phenc_conf_halbach_v03_240810_oil
+phenc_conf = phenc_conf_halbach_v03_240810_oil()
 
 # modify the config
 phenc_conf.en_fit = True

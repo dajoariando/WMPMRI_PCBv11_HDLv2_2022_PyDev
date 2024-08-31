@@ -10,7 +10,7 @@ from datetime import datetime
 import os
 import shutil
 
-import pydevd
+# import pydevd
 
 from nmr_std_function.ntwrk_functions import exec_rmt_ssh_cmd_in_datadir, init_ntwrk, exit_ntwrk
 import numpy as np
