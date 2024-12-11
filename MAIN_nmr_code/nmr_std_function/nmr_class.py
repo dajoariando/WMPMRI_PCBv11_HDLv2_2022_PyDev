@@ -205,6 +205,21 @@ class nmr_system_2022:
         ssh_cmd = self.server_path +'/'+ self.exec_folder +'/'+ command
         exec_rmt_ssh_cmd_in_datadir( self.ssh, ssh_cmd, self.server_data_folder )
      
+    def noise_timeavg( self, f_adc, samples, avg_fact, vvarac ):
+        # execute cpmg sequence
+        exec_name = "noise_timeavg"
+
+        command = ( exec_name + " " +
+                   str( f_adc ) + " " +
+                   str( samples ) + " " +
+                   str( avg_fact ) + " " +
+                   str ( vvarac ) + " " +
+                   "0 0 0" # data input mode
+                   )
+    
+        ssh_cmd = self.server_path +'/'+ self.exec_folder +'/'+ command
+        exec_rmt_ssh_cmd_in_datadir( self.ssh, ssh_cmd, self.server_data_folder )
+        
     def noise( self, f_adc, samples, vvarac ):
         # execute cpmg sequence
         exec_name = "noise"

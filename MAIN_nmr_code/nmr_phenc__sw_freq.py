@@ -38,8 +38,8 @@ nmrObj = nmr_system_2022( client_data_folder )
 tmeas.reportTimeSinceLast("### load libraries")
 
 # import default measurement configuration
-from sys_configs.phenc_conf_halbach_v03_240810_oil import phenc_conf_halbach_v03_240810_oil
-phenc_conf = phenc_conf_halbach_v03_240810_oil()
+from sys_configs.phenc_conf_halbach_v10_241205_oil import scan_config
+phenc_conf = scan_config()
 
 # sweep frequency
 val_center = phenc_conf.cpmg_freq

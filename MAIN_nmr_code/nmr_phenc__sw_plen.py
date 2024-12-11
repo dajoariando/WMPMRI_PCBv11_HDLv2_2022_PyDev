@@ -38,13 +38,13 @@ nmrObj = nmr_system_2022( client_data_folder )
 tmeas.reportTimeSinceLast("### load libraries")
 
 # import default measurement configuration
-from sys_configs.phenc_conf_halbach_v03_240810_oil import phenc_conf_halbach_v03_240810_oil
-phenc_conf = phenc_conf_halbach_v03_240810_oil()
+from sys_configs.phenc_conf_halbach_v10_241205_oil import scan_config
+phenc_conf = scan_config()
 
 # sweep pi/2 pulse length 
-val_center = 17
-val_range = 20
-val_npts = 21
+val_center = 25
+val_range = 10
+val_npts = 11
 val_sw = np.linspace(val_center-0.5*val_range,val_center+0.5*val_range,val_npts)
 
 # modify the experiment parameters
@@ -93,7 +93,7 @@ for i,val_curr in enumerate(val_sw):
     
     print("\t\t\t\texpt: %d/%d ----- pi/2 length = %0.3f us" % (i,len(val_sw)-1,val_curr) )
     phenc_conf.p90_us = val_curr
-    phenc_conf.p180_us = phenc_conf.p90_us
+    phenc_conf.p180_us = val_curr*phenc_conf.p180_p90_len_fact
     expt_num = i
     # asum_re[i], asum_im[i], _, _, _, _, _, theta[i], _, _= phenc(nmrObj, phenc_conf, expt_num, sav_fig, show_fig)
     asum_re[i], asum_im[i], _, _, _, _, _, theta[i], _, _, _, _ = cpmg(nmrObj, phenc_conf, expt_num, sav_fig, show_fig)

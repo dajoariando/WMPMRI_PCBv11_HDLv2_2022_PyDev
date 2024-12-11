@@ -622,7 +622,9 @@ def plot_noise_multch( minfreq, maxfreq, data_parent_folder, plotname, en_fig ):
     # en_fig            : enable figure
 
     # compute settings
-    plot_time_or_samplenum = False
+    plot_time_or_samplenum = True # put 1 if plotting Time, otherwise plotting sample number
+    binary_OR_ascii = False # put 1 if the data file uses binary representation, otherwise it is in ascii format
+    float_OR_int32 = False # put 1 if the data file uses float representation, otherwise it is in int32 format
 
     data_folder = ( data_parent_folder + '/' )
     fig_num = 200
@@ -636,14 +638,27 @@ def plot_noise_multch( minfreq, maxfreq, data_parent_folder, plotname, en_fig ):
         'samples', param_list, value_list ) )
     nrChannels = int( data_parser.find_value( 
         'adc_channel', param_list, value_list ) )
+    
 
     # parse file and remove DC component
     nmean = 0
     file_path = ( data_folder + 'noise.txt' )
-    one_scan_raw = np.array( data_parser.read_data( file_path ) )
+    
+    # one_scan_raw = np.array( data_parser.read_data( file_path ) )
+    if float_OR_int32:
+        if binary_OR_ascii:
+            one_scan_raw = data_parser.read_hex_float( file_path )  # use binary representation
+        else:
+            one_scan_raw = np.array( data_parser.read_data( file_path ) ) # use ascii representation
+    else:
+        if binary_OR_ascii:
+            one_scan_raw = data_parser.read_hex_int32 (file_path) # read int32 in binary representation
+        else:
+            one_scan_raw = np.array( data_parser.read_data( file_path ) ) # use ascii representation
+    
     one_scan_raw = np.resize(one_scan_raw,(nrPnts,nrChannels))
     one_scan_raw = np.transpose(one_scan_raw)  
-
+   
     # compute in-bandwidth noise
     Sf = adcFreq * 1e6
     T = 1 / Sf
@@ -680,7 +695,10 @@ def plot_noise_multch( minfreq, maxfreq, data_parent_folder, plotname, en_fig ):
                 line1, = ax.plot( one_scan_raw[j], 'b-' , linewidth = 0.5 )
             
             if j == nrChannels-1:
-                ax.set_xlabel( 'Time(ms)' )
+                if plot_time_or_samplenum:
+                    ax.set_xlabel( 'Time(ms)' )
+                else: 
+                    ax.set_xlabel( 'Sample(#)' )
                 ax.set_ylabel( 'Amplitude (a.u.)' )
                 # ax.set_title( "Amplitude. std=%0.2f. mean=%0.2f." % ( nstd, nmean ) )
             else:
@@ -727,6 +745,144 @@ def plot_noise_multch( minfreq, maxfreq, data_parent_folder, plotname, en_fig ):
 
         # fig = plt.gcf() # obtain handle
         plt.savefig( data_folder + plotname )
+
+#======================
+#==Cheng==  
+def plot_noise_multch_avg( minfreq, maxfreq, data_parent_folder, plotname, en_fig ):
+
+    # variables to be input
+    # en_filt            : enable the software post-processing filter to limit the measurement bandwidth
+    # data_parent_folder : the folder for all datas
+    # bw_kHz            : filter bandwidth
+    # filt_ord : filter order
+    # en_fig            : enable figure
+    
+    # compute settings
+    plot_time_or_samplenum = True
+    binary_OR_ascii = False # put 1 if the data file uses binary representation, otherwise it is in ascii format
+    float_OR_int32 = False # put 1 if the data file uses float representation, otherwise it is in int32 format
+
+    data_folder = ( data_parent_folder + '/' )
+    fig_num = 200
+
+    # variables from NMR settings
+    ( param_list, value_list ) = data_parser.parse_info( 
+        data_folder, 'acqu.par' )  # read file
+    adcFreq = data_parser.find_value( 
+        'adcFreq', param_list, value_list )
+    nrPnts = int( data_parser.find_value( 
+        'samples', param_list, value_list ) )
+    nrChannels = int( data_parser.find_value( 
+        'adc_channel', param_list, value_list ) )
+
+    # parse file and remove DC component
+    nmean = 0
+    file_path = ( data_folder + 'noise.txt' )
+    # one_scan_raw = np.array( data_parser.read_data( file_path ) )
+    if float_OR_int32:
+        if binary_OR_ascii:
+            one_scan_raw = data_parser.read_hex_float( file_path )  # use binary representation
+        else:
+            one_scan_raw = np.array( data_parser.read_data( file_path ) ) # use ascii representation
+    else:
+        if binary_OR_ascii:
+            one_scan_raw = data_parser.read_hex_int32 (file_path) # read int32 in binary representation
+        else:
+            one_scan_raw = np.array( data_parser.read_data( file_path ) ) # use ascii representation
+    one_scan_raw = np.resize(one_scan_raw,(nrPnts,nrChannels))
+    one_scan_raw = np.transpose(one_scan_raw)  
+
+    # compute in-bandwidth noise
+    Sf = adcFreq * 1e6
+    T = 1 / Sf
+    t = np.linspace( 0, T * ( len( one_scan_raw[0] ) - 1 ), len( one_scan_raw[0] ) )
+
+
+    if en_fig:
+        plt.ion()
+        fig = plt.figure( fig_num )
+
+        # maximize window
+        plot_backend = matplotlib.get_backend()
+        mng = plt.get_current_fig_manager()
+        if plot_backend == 'TkAgg' or plot_backend == 'tkagg':
+            # mng.resize(*mng.window.maxsize())
+            mng.resize( 1800, 800 )
+        elif plot_backend == 'wxAgg':
+            mng.frame.Maximize( True )
+        elif plot_backend == 'Qt4Agg':
+            mng.window.showMaximized()
+
+        fig.clf()
+        
+        nplot = 3 # the number of plots, i.e., time-domain, freq-domain, histogram
+        spectyArray = np.zeros((nrPnts,nrChannels),dtype=float)
+        for j in range(0,nrChannels):
+            # plot time domain data
+            ax = fig.add_subplot( nrChannels,nplot,1+j*nplot )
+            x_time = np.linspace( 1, len( one_scan_raw[j] ), len(one_scan_raw[j]) )
+            x_time = np.multiply( x_time, ( 1 / adcFreq ) )  # in us
+            x_time = np.multiply( x_time, 1e-3 )  # in ms
+            if plot_time_or_samplenum:
+                line1, = ax.plot( x_time, one_scan_raw[j], 'b-' , linewidth = 0.5 )
+            else:
+                line1, = ax.plot( one_scan_raw[j], 'b-' , linewidth = 0.5 )
+            
+            if j == nrChannels-1:
+                if plot_time_or_samplenum:
+                    ax.set_xlabel( 'Time(ms)' )
+                else: 
+                    ax.set_xlabel( 'Sample(#)' )
+                ax.set_ylabel( 'Amplitude (a.u.)' )
+                # ax.set_title( "Amplitude. std=%0.2f. mean=%0.2f." % ( nstd, nmean ) )
+            else:
+                ax.axes.get_xaxis().set_visible(False)
+            # ax.grid()
+            
+            # compute fft
+            spectx, specty = nmr_fft( one_scan_raw[j], adcFreq, 0 )
+            fft_range = [i for i, value in enumerate( spectx ) if ( 
+                value >= minfreq and value <= maxfreq )]  # limit fft display
+            
+            ax = fig.add_subplot( nrChannels,nplot,2+j*nplot )
+            line1, = ax.plot( spectx[fft_range], specty[fft_range], 'b-', label = 'data', linewidth = 0.5 )
+            # plt.ylim( [0, 50] )
+            
+            if j == nrChannels-1:
+                ax.set_xlabel( 'Frequency (MHz)' )
+                ax.set_ylabel( 'Amplitude (a.u.)' )
+                # ax.set_title( "Amplitude. std=%0.2f. mean=%0.2f." % ( nstd, nmean ) )
+                #plt.ylim( [0, 4] )
+            else:
+                ax.axes.get_xaxis().set_visible(False)
+            # ax.grid()
+            
+            
+            # plot histogram
+            n_bins = 200
+            ax = fig.add_subplot( nrChannels,nplot,3+j*nplot )
+            n, bins, patches = ax.hist( one_scan_raw[j], bins = n_bins )
+            ax.set_xlabel( 'Histogram' )
+            ax.set_ylabel( 'Amplitude (a.u.)' )
+            #if j == nrChannels-1:
+            #    ax.set_xlabel( 'Histogram' )
+            #    ax.set_ylabel( 'Amplitude (a.u.)' )
+                # ax.set_title( "Histogram" )
+            #else:
+            #    ax.axes.get_xaxis().set_visible(False)
+            # ax.grid()
+            spectyArray[:,j] = np.square(specty)
+            
+        # plt.subplot_tool()
+        plt.subplots_adjust(hspace=0)
+        fig.canvas.draw()
+        fig.canvas.flush_events()
+
+        # fig = plt.gcf() # obtain handle
+        plt.savefig( data_folder + plotname )
+        
+        return spectx, spectyArray
+     #======================    
 
 def calcP90( Vpp, rs, L, f, numTurns, coilLength, coilFactor ):
 

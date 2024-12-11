@@ -12,7 +12,7 @@ The data order is d0_ch0 - d0_ch1 - d0_ch2 - d1_ch0 - d1_ch1 - d1_ch2 - d2_ch0 -
 
 import os
 from datetime import datetime
-# import pydevd
+#import pydevd
 from scipy import signal
 import matplotlib.pyplot as plt
 
@@ -29,10 +29,10 @@ def init( client_data_folder ):
     return nmrObj
 
 
-def analyze( nmrObj, vvarac, samp_freq, samples, min_freq, max_freq, continuous, en_fig ):
+def analyze( nmrObj, vvarac, samp_freq, samples, avg_fact, min_freq, max_freq, continuous, en_fig ):
 
     while True:
-        nmrObj.noise( samp_freq, samples, vvarac )
+        nmrObj.noise_timeavg( samp_freq, samples, avg_fact, vvarac )
 
         cp_rmt_file( nmrObj.scp, nmrObj.server_data_folder, nmrObj.client_data_folder, "noise.txt" )
         cp_rmt_file( nmrObj.scp, nmrObj.server_data_folder, nmrObj.client_data_folder, "acqu.par" )
@@ -42,36 +42,35 @@ def analyze( nmrObj, vvarac, samp_freq, samples, min_freq, max_freq, continuous,
         print("vvarac : ", vvarac, "\n")
                 
         '''
-        if (vvarac > 4):
-                vvarac = vvarac - 0.1;
+        if (vvarac < 0.5):
+                vvarac = vvarac + 0.5;
         else:
-            vvarac = 4.99;
-        '''
+            vvarac = -4.9;
         
         
         if ( not continuous ):
             
             break
-        
+        '''
 
 def exit( nmrObj ):
     nmrObj.exit()
 
 
 # import default measurement configuration and modify
-from sys_configs.phenc_conf_halbach_v10_241205_oil import scan_config
+from sys_configs.phenc_conf_halbach_v03_240810_oil import scan_config
 phenc_conf = scan_config()
 
 # uncomment this line to debug the nmr noise code locally here
 samp_freq = 40  # sampling frequency
 samples = 100000  # number of points
-avg_fact = 1 # averaging factor
+avg_fact = 100 # averaging factor
 vvarac = phenc_conf.vvarac # voltage for the preamp (more negative, more capacitance)
-min_freq = 3  # in MHz
-max_freq = 10  # in MHz
+min_freq = 4.0  # in MHz
+max_freq = 4.8  # in MHz
 continuous = True  # continuous running at one frequency configuration
 client_data_folder = "D:\\NMR_DATA"
 en_fig = True
 nmrObj = init( client_data_folder )
-analyze( nmrObj, vvarac, samp_freq, samples, min_freq, max_freq, continuous, en_fig )
+analyze( nmrObj, vvarac, samp_freq, samples, avg_fact, min_freq, max_freq, continuous, en_fig )
 exit( nmrObj )

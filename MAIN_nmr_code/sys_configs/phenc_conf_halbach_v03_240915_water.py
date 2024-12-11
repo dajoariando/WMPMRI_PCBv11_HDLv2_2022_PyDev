@@ -9,7 +9,7 @@ class scan_config():
     non_stdy_state_mult = 2.0 # if the current still ramps up during Tx (no steady-state), the usual 1.0 factor for p180_dchg_us won't be enough. This causes the current to leak through to rx and perturbs it. To make sure this does not happen, prolong the discharge time after Tx pulse.
     
     # cpmg settings
-    cpmg_freq = 4.355 # 4.158 # 4.164 # in MHz
+    cpmg_freq = 4.333 # 4.158 # 4.164 # in MHz
     bstrap_pchg_us = 2000
     lcs_pchg_us = 20
     lcs_dump_us = 100
@@ -24,11 +24,11 @@ class scan_config():
     p180_dchg_us = (p180_pchg_us+p180_pchg_refill_us)*non_stdy_state_mult # used to be p90_dchg_us
     p180_dtcl = p90_dtcl
     echoshift_us = 12
-    echotime_us = 500 # 400 or 70
-    scanspacing_us = 1000000 # normally 100000 for doped water
-    samples_per_echo = 2000 # 1000, 600, 200, 100
-    echoes_per_scan = 250 # 280 for water, 400 for oil
-    n_iterate =  4
+    echotime_us = 1000 # 400 or 70
+    scanspacing_us = 4000000 # normally 100000 for doped water
+    samples_per_echo = 400 # 1000, 600, 200, 100
+    echoes_per_scan = 1000 # 280 for water, 400 for oil
+    n_iterate =  2
     ph_cycl_en = 1 # phase cycle enable
     dconv_fact = 1 # unused for current cpmg code
     echoskip = 1 # unused for current cpmg code
@@ -77,10 +77,10 @@ class scan_config():
     # dual_exp = 0 # enable dual exponential fit. Otherwise, it will be single exponential fit
     # a_est = [30,100] # amplitude estimation for fitting
     # t2_est = [10e-3,200e-3] # t2 estimate for fitting
-    a_est = [100,10] # array of amplitude estimate for fitting
-    t2_est = [200e-3,20e-3] # array of t2 estimate for fitting
-    a_bnd = [0,200] # the bound is global for all a_est
-    t2_bnd = [1e-3,500e-3] # the bound is global for all t2_est
+    a_est = [20,10] # array of amplitude estimate for fitting
+    t2_est = [1000e-3,20e-3] # array of t2 estimate for fitting
+    a_bnd = [0,100] # the bound is global for all a_est
+    t2_bnd = [1e-3,2000e-3] # the bound is global for all t2_est
     en_fit = True
 
     en_spect_ref = 0 # set spectrum reference compensation
