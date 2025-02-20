@@ -42,9 +42,9 @@ from sys_configs.phenc_conf_halbach_v10_241205_oil import scan_config
 phenc_conf = scan_config()
 
 # sweep frequency
-val_center = phenc_conf.cpmg_freq
-val_range = 100e-3
-val_npts = 21
+val_center = 8.9
+val_range = 200e-3
+val_npts = 11
 val_sw = np.linspace(val_center-0.5*val_range,val_center+0.5*val_range,val_npts)
 
 # modify the experiment parameters
@@ -76,8 +76,8 @@ sav_fig = 1 # save figures
 show_fig = 0  # show figures
 
 # settings for measurements
-phenc_conf.en_lcs_pchg = 0 # disable lcs precharging because the vpc is already precharged by the reference scan
-phenc_conf.en_lcs_dchg = 0 # disable lcs discharging because the vpc has to maintain its voltage for next scan
+phenc_conf.en_lcs_pchg = 1 # disable lcs precharging because the vpc is already precharged by the reference scan
+phenc_conf.en_lcs_dchg = 1 # disable lcs discharging because the vpc has to maintain its voltage for next scan
 
 # data container
 # set data containers

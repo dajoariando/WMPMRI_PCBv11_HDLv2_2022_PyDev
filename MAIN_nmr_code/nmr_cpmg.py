@@ -47,7 +47,7 @@ nmrObj = nmr_system_2022( client_data_folder )
 tmeas.reportTimeSinceLast("### load libraries")
 
 # import default measurement configuration
-from sys_configs.phenc_conf_halbach_v10_241205_oil import scan_config
+from sys_configs.phenc_conf_halbach_v10_241205_oil_sys1 import scan_config
 phenc_conf = scan_config()
 
 # modify the config

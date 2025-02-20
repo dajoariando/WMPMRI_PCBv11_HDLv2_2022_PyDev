@@ -38,13 +38,13 @@ nmrObj = nmr_system_2022( client_data_folder )
 tmeas.reportTimeSinceLast("### load libraries")
 
 # import default measurement configuration
-from sys_configs.phenc_conf_halbach_v03_240810_oil import scan_config
+from sys_configs.phenc_conf_halbach_v10_241205_oil import scan_config
 phenc_conf = scan_config()
 
 # sweep val_sw
-val_center = 2.0
-val_range = 2
-val_npts = 21
+val_center = 22.0
+val_range = 10
+val_npts = 11
 val_sw = np.linspace(val_center-0.5*val_range,val_center+0.5*val_range,val_npts)
 
 # modify the experiment parameters
@@ -76,8 +76,8 @@ sav_fig = 1 # save figures
 show_fig = 0  # show figures
 
 # settings for measurements
-phenc_conf.en_lcs_pchg = 0 # disable lcs precharging because the vpc is already precharged by the reference scan
-phenc_conf.en_lcs_dchg = 0 # disable lcs discharging because the vpc has to maintain its voltage for next scan
+phenc_conf.en_lcs_pchg = 1 # disable lcs precharging because the vpc is already precharged by the reference scan
+phenc_conf.en_lcs_dchg = 1 # disable lcs discharging because the vpc has to maintain its voltage for next scan
 
 # data container
 # set data containers
@@ -94,11 +94,8 @@ for i,val_curr in enumerate(val_sw):
     print("\t\t\t\texpt: %d/%d ----- val = %0.3f " % (i,len(val_sw)-1,val_curr) )
     
     # val to sweep
-    phenc_conf.p180_p90_fact = val_curr
-    phenc_conf.p180_pchg_us = phenc_conf.plen_base *phenc_conf.p180_p90_fact
-    phenc_conf.p180_pchg_refill_us = phenc_conf.plen_base*phenc_conf.refill_mult*phenc_conf.p180_p90_fact
-    phenc_conf.p180_dchg_us = phenc_conf.p180_pchg_us+phenc_conf.p180_pchg_refill_us # used to be p90_dchg_us
-    
+    phenc_conf.p90_us = val_curr
+    phenc_conf.p180_us = val_curr*phenc_conf.p180_p90_len_fact
     
     expt_num = i
     # asum_re[i], asum_im[i], _, _, _, _, _, theta[i], _, _= phenc(nmrObj, phenc_conf, expt_num, sav_fig, show_fig)

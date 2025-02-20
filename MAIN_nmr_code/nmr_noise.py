@@ -63,12 +63,12 @@ from sys_configs.phenc_conf_halbach_v10_241205_oil import scan_config
 phenc_conf = scan_config()
 
 # uncomment this line to debug the nmr noise code locally here
-samp_freq = 40  # sampling frequency
-samples = 100000  # number of points
+samp_freq = 20  # sampling frequency
+samples = 500000  # number of points
 avg_fact = 1 # averaging factor
 vvarac = phenc_conf.vvarac # voltage for the preamp (more negative, more capacitance)
-min_freq = 3  # in MHz
-max_freq = 10  # in MHz
+min_freq = 8.5  # in MHz
+max_freq = 9.5  # in MHz
 continuous = True  # continuous running at one frequency configuration
 client_data_folder = "D:\\NMR_DATA"
 en_fig = True

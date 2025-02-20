@@ -30,11 +30,11 @@ class nmr_system_2022:
         self.dconv_gain = 0.707106781  # downconversion gain factor due to sine(45,135,225,315) multiplication
 
         # ip addresses settings for the system
-        self.server_ip = '192.168.14.204'  # '129.22.143.88'
-        self.client_ip = '192.168.14.105'  # '129.22.143.39'
+        self.server_ip = '192.168.14.204' # '192.168.14.204'  # '129.22.143.88'
+        self.client_ip = '192.168.14.153' # '192.168.14.105'  # '129.22.143.39'
         self.server_path = '/root'
         # client path with samba
-        self.client_path = 'W:\\'
+        self.client_path = 'Y:\\'
         self.ssh_usr = 'root'
         self.ssh_passwd = 'dave'
         # data folder
@@ -229,6 +229,26 @@ class nmr_system_2022:
                    str( samples ) + " " +
                    str ( vvarac ) + " " +
                    "0 0 0" # data input mode
+                   )
+    
+        ssh_cmd = self.server_path +'/'+ self.exec_folder +'/'+ command
+        exec_rmt_ssh_cmd_in_datadir( self.ssh, ssh_cmd, self.server_data_folder )
+        
+    def testbench( self, f_larmor, bstrap_pchg_us, lcs_vpc_pchg_us, lcs_recycledump_us, lcs_vpc_pchg_repeat, lcs_vpc_dchg_us, lcs_wastedump_us, lcs_vpc_dchg_repeat, en_lcs_pchg, en_lcs_dchg ):
+        # execute cpmg sequence
+        exec_name = "testbench"
+
+        command = ( exec_name + " " +
+                   str ( f_larmor ) + " " +
+                   str ( bstrap_pchg_us ) + " " +
+                   str ( lcs_vpc_pchg_us ) + " " +
+                   str ( lcs_recycledump_us ) + " " +
+                   str ( lcs_vpc_pchg_repeat ) + " " +
+                   str ( lcs_vpc_dchg_us ) + " " +
+                   str ( lcs_wastedump_us ) + " " +
+                   str ( lcs_vpc_dchg_repeat ) + " " +
+                   str ( en_lcs_pchg ) + " " +
+                   str ( en_lcs_dchg )
                    )
     
         ssh_cmd = self.server_path +'/'+ self.exec_folder +'/'+ command

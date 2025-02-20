@@ -9,7 +9,7 @@ class scan_config():
     non_stdy_state_mult = 2.0 # if the current still ramps up during Tx (no steady-state), the usual 1.0 factor for p180_dchg_us won't be enough. This causes the current to leak through to rx and perturbs it. To make sure this does not happen, prolong the discharge time after Tx pulse.
     
     # cpmg settings
-    cpmg_freq = 4.333 # 4.158 # 4.164 # in MHz
+    cpmg_freq = 4.351 # 4.158 # 4.164 # in MHz
     bstrap_pchg_us = 2000
     lcs_pchg_us = 20
     lcs_dump_us = 100
@@ -28,7 +28,7 @@ class scan_config():
     scanspacing_us = 4000000 # normally 100000 for doped water
     samples_per_echo = 400 # 1000, 600, 200, 100
     echoes_per_scan = 1000 # 280 for water, 400 for oil
-    n_iterate =  2
+    n_iterate =  4
     ph_cycl_en = 1 # phase cycle enable
     dconv_fact = 1 # unused for current cpmg code
     echoskip = 1 # unused for current cpmg code

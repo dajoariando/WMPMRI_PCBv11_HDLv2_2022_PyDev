@@ -42,7 +42,7 @@ from sys_configs.phenc_conf_halbach_v10_241205_oil import scan_config
 phenc_conf = scan_config()
 
 # sweep pi/2 pulse length 
-val_center = 25
+val_center = 6
 val_range = 10
 val_npts = 11
 val_sw = np.linspace(val_center-0.5*val_range,val_center+0.5*val_range,val_npts)

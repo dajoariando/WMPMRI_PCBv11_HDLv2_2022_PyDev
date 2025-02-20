@@ -9,7 +9,7 @@ class scan_config():
     non_stdy_state_mult = 2.0 # if the current still ramps up during Tx (no steady-state), the usual 1.0 factor for p180_dchg_us won't be enough. This causes the current to leak through to rx and perturbs it. To make sure this does not happen, prolong the discharge time after Tx pulse.
     
     # cpmg settings
-    cpmg_freq = 4.355 # 4.158 # 4.164 # in MHz
+    cpmg_freq = 4.351 # 4.158 # 4.164 # in MHz
     bstrap_pchg_us = 2000
     lcs_pchg_us = 20
     lcs_dump_us = 100
