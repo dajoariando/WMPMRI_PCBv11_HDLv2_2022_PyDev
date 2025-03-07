@@ -11,7 +11,7 @@ class scan_config():
     
     
     # cpmg settings
-    cpmg_freq = 9.008 # 9.035 # 4.355 # 4.158 # 4.164 # in MHz
+    cpmg_freq = 9.000-39e-3 # 9.035 # 4.355 # 4.158 # 4.164 # in MHz
     bstrap_pchg_us = 2000
     lcs_pchg_us = 20
     lcs_dump_us = 100
@@ -26,11 +26,11 @@ class scan_config():
     p180_dchg_us = (p180_pchg_us+p180_pchg_refill_us)*non_stdy_state_mult # used to be p90_dchg_us
     p180_dtcl = p90_dtcl
     echoshift_us = 15
-    echotime_us = 500 # 400 or 70
-    scanspacing_us = 400000 # normally 100000 for doped water
-    samples_per_echo = 2000 # 1000, 600, 200, 100
-    echoes_per_scan = 250 # 280 for water, 400 for oil
-    n_iterate =  1
+    echotime_us = 400 # 400 or 70
+    scanspacing_us = 200000 # normally 100000 for doped water
+    samples_per_echo = 4000 # 1000, 600, 200, 100
+    echoes_per_scan = 30 # 280 for water, 400 for oil
+    n_iterate =  4
     ph_cycl_en = 1 # phase cycle enable
     dconv_fact = 1 # unused for current cpmg code
     echoskip = 1 # unused for current cpmg code
@@ -49,6 +49,14 @@ class scan_config():
     gradz_volt = 0.1 # the gradient can be positive or negative
     gradx_len_us = 100 # gradient pulse length
     gradx_volt = 1.5 # the gradient can be positive or negative
+    VxA = 2.505 # null voltage for the gradient
+    VxB = 2.481 # null voltage for the gradient
+    VxC = 2.494 # null voltage for the gradient
+    VxD = 2.491 # null voltage for the gradient
+    VyA = 2.488 # null voltage for the gradient
+    VyB = 2.509 # null voltage for the gradient
+    VyC = 2.513 # null voltage for the gradient
+    VyD = 2.501 # null voltage for the gradient
     grad_refocus = 1 # put 1 to refocus the gradient
     flip_grad_refocus_sign = 1 # put 1 to flip the gradient refocusing sign
     enc_tao_us = 200 # the encoding time

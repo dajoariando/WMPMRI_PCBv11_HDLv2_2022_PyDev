@@ -50,11 +50,11 @@ from sys_configs.phenc_conf_halbach_v10_241205_oil_sys1 import scan_config
 phenc_conf = scan_config()
 
 # modify the experiment parameters
-phenc_conf.gradz_volt = -1000
-phenc_conf.gradx_volt = -1000
-phenc_conf.gradz_len_us = 1000
-phenc_conf.gradx_len_us = 1000
-phenc_conf.enc_tao_us = 10000
+phenc_conf.gradz_volt = 1
+phenc_conf.gradx_volt = 1
+phenc_conf.gradz_len_us = 100
+phenc_conf.gradx_len_us = 100
+phenc_conf.enc_tao_us = 500
 
 # run the experiment
 phenc(nmrObj, phenc_conf, expt_num, sav_fig, show_fig)

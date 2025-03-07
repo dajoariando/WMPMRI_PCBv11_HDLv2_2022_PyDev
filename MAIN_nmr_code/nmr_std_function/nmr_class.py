@@ -184,10 +184,17 @@ class nmr_system_2022:
                    
                    str( phenc_conf.gradz_len_us ) + " " +
                    str( phenc_conf.gradz_volt ) + " " +
-                   
                    str( phenc_conf.gradx_len_us ) + " " +
-                   str( phenc_conf.gradx_volt ) + " " +
-                   
+                   str( phenc_conf.gradx_volt ) + " " +           
+                   str( phenc_conf.VxA ) + " " +
+                   str( phenc_conf.VxB ) + " " +
+                   str( phenc_conf.VxC ) + " " +
+                   str( phenc_conf.VxD ) + " " +
+                   str( phenc_conf.VyA ) + " " +
+                   str( phenc_conf.VyB ) + " " +
+                   str( phenc_conf.VyC ) + " " +
+                   str( phenc_conf.VyD ) + " " +
+
                    str( phenc_conf.grad_refocus) + " " +
                    str( phenc_conf.flip_grad_refocus_sign) + " " +
                    
@@ -253,3 +260,56 @@ class nmr_system_2022:
     
         ssh_cmd = self.server_path +'/'+ self.exec_folder +'/'+ command
         exec_rmt_ssh_cmd_in_datadir( self.ssh, ssh_cmd, self.server_data_folder )
+        
+    def tb_grad_current (self, SYSCLK_MHz, bstrap_pchg_us,front_porch_us,grad_len_us,grad_blanking_us, back_tail_us,grady_mA,gradx_mA,ibias_x_A,ibias_x_C,ibias_y_A,ibias_y_C,grad_refocus,flip_grad_refocus_sign):
+        # execute cpmg sequence
+        exec_name = "tb_grad_current"
+        
+        command = ( exec_name + " " +
+                   str ( SYSCLK_MHz ) + " " +
+                   str ( bstrap_pchg_us ) + " " +
+                   str ( front_porch_us ) + " " +
+                   str ( grad_len_us ) + " " +
+                   str ( grad_blanking_us ) + " " +
+                   str ( back_tail_us ) + " " +
+                   str ( grady_mA ) + " " +
+                   str ( gradx_mA ) + " " +
+                   str ( ibias_x_A ) + " " +
+                   str ( ibias_x_C ) + " " +
+                   str ( ibias_y_A ) + " " +
+                   str ( ibias_y_C ) + " " +
+                   str ( grad_refocus ) + " " +
+                   str ( flip_grad_refocus_sign )
+                   )
+    
+        ssh_cmd = self.server_path +'/'+ self.exec_folder +'/'+ command
+        exec_rmt_ssh_cmd_in_datadir( self.ssh, ssh_cmd, self.server_data_folder )
+        
+    def tb_grad_voltage (self, SYSCLK_MHz, bstrap_pchg_us, front_porch_us, grad_len_us, grad_blanking_us, back_tail_us, voltx_A, voltx_B, voltx_C, voltx_D, volty_A, volty_B, volty_C, volty_D, grad_refocus, flip_grad_refocus_sign, gradx_dir , grady_dir):
+        # execute cpmg sequence
+        exec_name = "tb_grad_voltage"
+        
+        command = ( exec_name + " " +
+                   str ( SYSCLK_MHz ) + " " +
+                   str ( bstrap_pchg_us ) + " " +
+                   str ( front_porch_us ) + " " +
+                   str ( grad_len_us ) + " " +
+                   str ( grad_blanking_us ) + " " +
+                   str ( back_tail_us ) + " " +
+                   str ( voltx_A ) + " " +
+                   str ( voltx_B ) + " " +
+                   str ( voltx_C ) + " " +
+                   str ( voltx_D ) + " " +
+                   str ( volty_A ) + " " +
+                   str ( volty_B ) + " " +
+                   str ( volty_C ) + " " +
+                   str ( volty_D ) + " " +
+                   str ( grad_refocus ) + " " +
+                   str ( flip_grad_refocus_sign ) + " " +
+                   str ( gradx_dir ) + " " +
+                   str ( grady_dir )
+                   )
+    
+        ssh_cmd = self.server_path +'/'+ self.exec_folder +'/'+ command
+        exec_rmt_ssh_cmd_in_datadir( self.ssh, ssh_cmd, self.server_data_folder )
+        

@@ -42,9 +42,9 @@ def phenc (nmrObj, phenc_conf, expt_num, sav_fig, show_fig):
     exec_rmt_ssh_cmd_in_datadir ( nmrObj.ssh, "rm dsum_%06d.txt acqu_%06d.par" % (expt_num, expt_num), nmrObj.server_data_folder )
     # post-processing
     #_, asum_re, asum_im, a0, snr, T2, noise, res, theta, _, _, _ = compute_multiple( nmrObj, phenc_conf, expt_num, sav_fig, show_fig)
-    _, asum_re, asum_im, a0, snr, T2, noise, res, theta, _, echo_avg, _, fpeak, spect, _ = compute_multiexp( nmrObj, phenc_conf, expt_num, sav_fig, show_fig )
+    _, asum_re, asum_im, a0, snr, T2, noise, res, theta, _, echo_avg, _, fpeak, spect, wvect = compute_multiexp( nmrObj, phenc_conf, expt_num, sav_fig, show_fig )
 
-    return asum_re, asum_im, a0, snr, T2, noise, res, theta, echo_avg, fpeak, spect
+    return asum_re, asum_im, a0, snr, T2, noise, res, theta, echo_avg, fpeak, spect, wvect
 
 
 # phase encoding experiment with both x-y p180 to get real (CPMG) and imaginary (CP) data to construct an image. With multithreading
@@ -66,7 +66,8 @@ def compute_phenc_ReIm_1D__mthread ( nmrObj, phenc_conf, expt_num, n, kspace, ks
     exec_rmt_ssh_cmd_in_datadir ( ssh, "rm dsum_%06d.txt acqu_%06d.par" % (expt_num, expt_num), nmrObj.server_data_folder )
     # post-processing
     #_, Y_asum_re, Y_asum_im, Y_a0, Y_snr, Y_T2, Y_noise, Y_res, Y_theta, _, _, _ = compute_multiple( nmrObj, phenc_conf, expt_num, sav_fig, show_fig)
-    _, Y_asum_re, Y_asum_im, Y_a0, Y_snr, Y_T2, Y_noise, Y_res, Y_theta, _, _, _ = compute_multiexp( nmrObj, phenc_conf, expt_num, sav_fig, show_fig)
+    _, Y_asum_re, Y_asum_im, Y_a0, Y_snr, Y_T2, Y_noise, Y_res, Y_theta, _, _, _, _, _, _ = compute_multiexp( nmrObj, phenc_conf, expt_num, sav_fig, show_fig)
+
     # delete the data to save space
     os.remove(indv_datadir+"\\dsum_%06d.txt" % expt_num)
     os.remove(indv_datadir+"\\acqu_%06d.par" % expt_num)
@@ -81,7 +82,7 @@ def compute_phenc_ReIm_1D__mthread ( nmrObj, phenc_conf, expt_num, n, kspace, ks
     exec_rmt_ssh_cmd_in_datadir ( ssh, "rm dsum_%06d.txt acqu_%06d.par" % (expt_num+1, expt_num+1), nmrObj.server_data_folder )
     # post-processing
     # _, X_asum_re, X_asum_im, X_a0, X_snr, X_T2, X_noise, X_res, X_theta, _, _, _ = compute_multiple( nmrObj, phenc_conf, expt_num+1, sav_fig, show_fig)
-    _, X_asum_re, X_asum_im, X_a0, X_snr, X_T2, X_noise, X_res, X_theta, _, _, _ = compute_multiexp( nmrObj, phenc_conf, expt_num+1, sav_fig, show_fig)
+    _, X_asum_re, X_asum_im, X_a0, X_snr, X_T2, X_noise, X_res, X_theta, _, _, _, _, _, _ = compute_multiexp( nmrObj, phenc_conf, expt_num+1, sav_fig, show_fig)
     # delete the data to save space
     os.remove(indv_datadir+"\\dsum_%06d.txt" % (expt_num+1))
     os.remove(indv_datadir+"\\acqu_%06d.par" % (expt_num+1))
